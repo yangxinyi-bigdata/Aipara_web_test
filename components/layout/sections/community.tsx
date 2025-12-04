@@ -19,22 +19,21 @@ export const CommunitySection = () => {
               <CardTitle className="text-4xl md:text-5xl font-bold flex flex-col items-center">
                 <DiscordIcon />
                 <div>
-                  Ready to join this
+                  加入
                   <span className="text-transparent pl-2 bg-gradient-to-r from-[#D247BF] to-primary bg-clip-text">
-                    Community?
+                    Aipara 社区
                   </span>
                 </div>
               </CardTitle>
             </CardHeader>
             <CardContent className="lg:w-[80%] text-xl text-muted-foreground">
-              Join our vibrant Discord community! Connect, share, and grow with
-              like-minded enthusiasts. Click to dive in! 🚀
+              交流长段输入、提示词预设、模型适配等经验，获取最新版本与内测通知。
             </CardContent>
 
             <CardFooter>
               <Button asChild>
                 <a href="https://discord.com/" target="_blank">
-                  Join Discord
+                  加入 Discord
                 </a>
               </Button>
             </CardFooter>

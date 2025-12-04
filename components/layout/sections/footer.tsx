@@ -11,78 +11,78 @@ export const FooterSection = () => {
             <Link href="#" className="flex font-bold items-center">
               <ChevronsDownIcon className="w-9 h-9 mr-2 bg-gradient-to-tr from-primary via-primary/70 to-primary rounded-lg border border-secondary" />
 
-              <h3 className="text-2xl">Shadcn</h3>
+              <h3 className="text-2xl">Aipara 输入法</h3>
             </Link>
           </div>
 
           <div className="flex flex-col gap-2">
-            <h3 className="font-bold text-lg">Contact</h3>
+            <h3 className="font-bold text-lg">链接</h3>
             <div>
               <Link href="#" className="opacity-60 hover:opacity-100">
-                Github
+                下载
               </Link>
             </div>
 
             <div>
               <Link href="#" className="opacity-60 hover:opacity-100">
-                Twitter
+                帮助文档
               </Link>
             </div>
 
             <div>
               <Link href="#" className="opacity-60 hover:opacity-100">
-                Instagram
-              </Link>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <h3 className="font-bold text-lg">Platforms</h3>
-            <div>
-              <Link href="#" className="opacity-60 hover:opacity-100">
-                iOS
-              </Link>
-            </div>
-
-            <div>
-              <Link href="#" className="opacity-60 hover:opacity-100">
-                Android
-              </Link>
-            </div>
-
-            <div>
-              <Link href="#" className="opacity-60 hover:opacity-100">
-                Web
+                视频教程
               </Link>
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
-            <h3 className="font-bold text-lg">Help</h3>
+            <h3 className="font-bold text-lg">平台</h3>
             <div>
               <Link href="#" className="opacity-60 hover:opacity-100">
-                Contact Us
+                Windows
               </Link>
             </div>
 
             <div>
               <Link href="#" className="opacity-60 hover:opacity-100">
-                FAQ
+                macOS
               </Link>
             </div>
 
             <div>
               <Link href="#" className="opacity-60 hover:opacity-100">
-                Feedback
+                Linux
               </Link>
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
-            <h3 className="font-bold text-lg">Socials</h3>
+            <h3 className="font-bold text-lg">帮助</h3>
             <div>
               <Link href="#" className="opacity-60 hover:opacity-100">
-                Twitch
+                联系我们
+              </Link>
+            </div>
+
+            <div>
+              <Link href="#" className="opacity-60 hover:opacity-100">
+                常见问题
+              </Link>
+            </div>
+
+            <div>
+              <Link href="#" className="opacity-60 hover:opacity-100">
+                反馈
+              </Link>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <h3 className="font-bold text-lg">社区</h3>
+            <div>
+              <Link href="#" className="opacity-60 hover:opacity-100">
+                微信/QQ 群
               </Link>
             </div>
 
@@ -94,7 +94,7 @@ export const FooterSection = () => {
 
             <div>
               <Link href="#" className="opacity-60 hover:opacity-100">
-                Dribbble
+                博客
               </Link>
             </div>
           </div>
@@ -103,14 +103,7 @@ export const FooterSection = () => {
         <Separator className="my-6" />
         <section className="">
           <h3 className="">
-            &copy; 2024 Designed and developed by
-            <Link
-              target="_blank"
-              href="https://github.com/leoMirandaa"
-              className="text-primary transition-all border-primary hover:border-b-2 ml-1"
-            >
-              Leo Miranda
-            </Link>
+            &copy; 2024 Aipara 输入法 · Rime 二次开发与 AI 深度集成
           </h3>
         </section>
       </div>

@@ -43,7 +43,7 @@ export const ContactSection = () => {
       firstName: "",
       lastName: "",
       email: "",
-      subject: "Web Development",
+      subject: "下载与体验",
       message: "",
     },
   });
@@ -52,7 +52,11 @@ export const ContactSection = () => {
     const { firstName, lastName, email, subject, message } = values;
     console.log(values);
 
-    const mailToLink = `mailto:leomirandadev@gmail.com?subject=${subject}&body=Hello I am ${firstName} ${lastName}, my Email is ${email}. %0D%0A${message}`;
+    const mailToLink = `mailto:team@aipara.app?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(
+      `您好，我是${firstName}${lastName}，联系邮箱 ${email}。\n${message}`
+    )}`;
 
     window.location.href = mailToLink;
   }
@@ -63,53 +67,52 @@ export const ContactSection = () => {
         <div>
           <div className="mb-4">
             <h2 className="text-lg text-primary mb-2 tracking-wider">
-              Contact
+              联系我们
             </h2>
 
-            <h2 className="text-3xl md:text-4xl font-bold">Connect With Us</h2>
+            <h2 className="text-3xl md:text-4xl font-bold">聊聊 Aipara</h2>
           </div>
           <p className="mb-8 text-muted-foreground lg:w-5/6">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum
-            ipsam sint enim exercitationem ex autem corrupti quas tenetur
+            想要下载、申请内测或企业定制词库？留下信息，我们会尽快联系你。
           </p>
 
           <div className="flex flex-col gap-4">
             <div>
               <div className="flex gap-2 mb-1">
                 <Building2 />
-                <div className="font-bold">Find us</div>
+                <div className="font-bold">我们在</div>
               </div>
 
-              <div>742 Evergreen Terrace, Springfield, IL 62704</div>
+              <div>线上团队 · 远程办公</div>
             </div>
 
             <div>
               <div className="flex gap-2 mb-1">
                 <Phone />
-                <div className="font-bold">Call us</div>
+                <div className="font-bold">电话</div>
               </div>
 
-              <div>+1 (619) 123-4567</div>
+              <div>+86 000-0000-0000（工作日）</div>
             </div>
 
             <div>
               <div className="flex gap-2 mb-1">
                 <Mail />
-                <div className="font-bold">Mail US</div>
+                <div className="font-bold">邮箱</div>
               </div>
 
-              <div>leomirandadev@gmail.com</div>
+              <div>team@aipara.app</div>
             </div>
 
             <div>
               <div className="flex gap-2">
                 <Clock />
-                <div className="font-bold">Visit us</div>
+                <div className="font-bold">响应时间</div>
               </div>
 
               <div>
-                <div>Monday - Friday</div>
-                <div>8AM - 4PM</div>
+                <div>工作日 10:00 - 19:00</div>
+                <div>邮件会尽量 24 小时内回复</div>
               </div>
             </div>
           </div>
@@ -129,9 +132,9 @@ export const ContactSection = () => {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem className="w-full">
-                        <FormLabel>First Name</FormLabel>
+                        <FormLabel>名字</FormLabel>
                         <FormControl>
-                          <Input placeholder="Leopoldo" {...field} />
+                          <Input placeholder="名" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -142,9 +145,9 @@ export const ContactSection = () => {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem className="w-full">
-                        <FormLabel>Last Name</FormLabel>
+                        <FormLabel>姓氏</FormLabel>
                         <FormControl>
-                          <Input placeholder="Miranda" {...field} />
+                          <Input placeholder="姓" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -158,11 +161,11 @@ export const ContactSection = () => {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>邮箱</FormLabel>
                         <FormControl>
                           <Input
                             type="email"
-                            placeholder="leomirandadev@gmail.com"
+                            placeholder="your@email.com"
                             {...field}
                           />
                         </FormControl>
@@ -178,30 +181,28 @@ export const ContactSection = () => {
                     name="subject"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Subject</FormLabel>
+                        <FormLabel>主题</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select a subject" />
+                              <SelectValue placeholder="请选择主题" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="Web Development">
-                              Web Development
+                            <SelectItem value="下载与体验">
+                              下载与体验
                             </SelectItem>
-                            <SelectItem value="Mobile Development">
-                              Mobile Development
+                            <SelectItem value="内测申请">内测申请</SelectItem>
+                            <SelectItem value="企业合作">
+                              企业合作/词库定制
                             </SelectItem>
-                            <SelectItem value="Figma Design">
-                              Figma Design
+                            <SelectItem value="团队版咨询">
+                              团队版咨询
                             </SelectItem>
-                            <SelectItem value="REST API">REST API</SelectItem>
-                            <SelectItem value="FullStack Project">
-                              FullStack Project
-                            </SelectItem>
+                            <SelectItem value="其他">其他</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -216,11 +217,11 @@ export const ContactSection = () => {
                     name="message"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Message</FormLabel>
+                        <FormLabel>留言</FormLabel>
                         <FormControl>
                           <Textarea
                             rows={5}
-                            placeholder="Your message..."
+                            placeholder="请描述你的需求、使用场景或希望体验的功能"
                             className="resize-none"
                             {...field}
                           />
@@ -232,7 +233,7 @@ export const ContactSection = () => {
                   />
                 </div>
 
-                <Button className="mt-4">Send message</Button>
+                <Button className="mt-4">发送信息</Button>
               </form>
             </Form>
           </CardContent>

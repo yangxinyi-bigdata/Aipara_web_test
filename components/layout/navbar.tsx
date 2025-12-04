@@ -1,5 +1,5 @@
 "use client";
-import { ChevronsDown, Github, Menu } from "lucide-react";
+import { ChevronsDown, Download, Menu } from "lucide-react";
 import React from "react";
 import {
   Sheet,
@@ -35,37 +35,39 @@ interface FeatureProps {
 
 const routeList: RouteProps[] = [
   {
-    href: "#testimonials",
-    label: "Testimonials",
+    href: "#benefits",
+    label: "核心优势",
   },
   {
-    href: "#team",
-    label: "Team",
+    href: "#features",
+    label: "功能总览",
   },
   {
-    href: "#contact",
-    label: "Contact",
+    href: "#pricing",
+    label: "版本计划",
   },
   {
     href: "#faq",
-    label: "FAQ",
+    label: "常见问题",
+  },
+  {
+    href: "#contact",
+    label: "联系我们",
   },
 ];
 
 const featureList: FeatureProps[] = [
   {
-    title: "Showcase Your Value ",
-    description: "Highlight how your product solves user problems.",
+    title: "段落输入 · 整段不顶屏",
+    description: "标点与拼音共存，一次完成整段输入，减少中断与回删。",
   },
   {
-    title: "Build Trust",
-    description:
-      "Leverages social proof elements to establish trust and credibility.",
+    title: "中英混输 · 反引号切换",
+    description: "不用切换输入模式，反引号即可进入英文，保持思路连贯。",
   },
   {
-    title: "Capture Leads",
-    description:
-      "Make your lead capture form visually appealing and strategically.",
+    title: "AI 转写 · 多模型候选",
+    description: "云端/多模型并行转写，结合历史上下文提高命中率。",
   },
 ];
 
@@ -75,7 +77,7 @@ export const Navbar = () => {
     <header className="shadow-inner bg-opacity-15 w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl top-5 mx-auto sticky border border-secondary z-40 rounded-2xl flex justify-between items-center p-2 bg-card">
       <Link href="/" className="font-bold text-lg flex items-center">
         <ChevronsDown className="bg-gradient-to-tr border-secondary from-primary via-primary/70 to-primary rounded-lg w-9 h-9 mr-2 border text-white" />
-        Shadcn
+        AI段落输入法
       </Link>
       {/* <!-- Mobile --> */}
       <div className="flex items-center lg:hidden">
@@ -96,7 +98,7 @@ export const Navbar = () => {
                 <SheetTitle className="flex items-center">
                   <Link href="/" className="flex items-center">
                     <ChevronsDown className="bg-gradient-to-tr border-secondary from-primary via-primary/70 to-primary rounded-lg w-9 h-9 mr-2 border text-white" />
-                    Shadcn
+                    Aipara 输入法
                   </Link>
                 </SheetTitle>
               </SheetHeader>
@@ -130,7 +132,7 @@ export const Navbar = () => {
         <NavigationMenuList>
           <NavigationMenuItem>
             <NavigationMenuTrigger className="bg-card text-base">
-              Features
+              功能亮点
             </NavigationMenuTrigger>
             <NavigationMenuContent>
               <div className="grid w-[600px] grid-cols-2 gap-5 p-4">
@@ -175,13 +177,13 @@ export const Navbar = () => {
       <div className="hidden lg:flex">
         <ToggleTheme />
 
-        <Button asChild size="sm" variant="ghost" aria-label="View on GitHub">
+        <Button asChild size="sm" variant="ghost" aria-label="立即下载">
           <Link
-            aria-label="View on GitHub"
-            href="https://github.com/nobruf/shadcn-landing-page.git"
-            target="_blank"
+            aria-label="立即下载"
+            href="#contact"
+            target="_self"
           >
-            <Github className="size-5" />
+            <Download className="size-5" />
           </Link>
         </Button>
       </div>

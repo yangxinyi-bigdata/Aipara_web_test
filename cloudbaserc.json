@@ -1,5 +1,5 @@
 {
-  "envId": "{{env.ENV_ID}}",
+  "envId": "aipara-2gj6wwwsabef0ce0",
   "functionRoot": "./functions",
   "functions": [],
   "ai": {

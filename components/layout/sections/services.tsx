@@ -17,26 +17,26 @@ interface ServiceProps {
 }
 const serviceList: ServiceProps[] = [
   {
-    title: "Custom Domain Integration",
+    title: "写作与长段输入",
     description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit adipisicing.",
-    pro: 0,
+      "整段拼音不顶屏，支持标点共存、光标搜索/跳转，适合长文与笔记场景。",
+    pro: ProService.NO,
   },
   {
-    title: "Social Media Integrations",
+    title: "AI 转写与多模型候选",
     description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Molestiae, dicta.",
-    pro: 0,
+      "云端/本地模型并行生成候选，提高命中率，可按需选择上屏。",
+    pro: ProService.YES,
   },
   {
-    title: "Email Marketing Integrations",
-    description: "Lorem dolor sit amet adipisicing.",
-    pro: 0,
+    title: "提示词与角色预设",
+    description: "前缀触发不同 AI 助手，适配写作、翻译、代码讲解等场景。",
+    pro: ProService.YES,
   },
   {
-    title: "SEO Optimization",
-    description: "Lorem ipsum dolor sit amet consectetur.",
-    pro: 1,
+    title: "团队词库与云同步",
+    description: "统一词库、快捷短语与配置，同步到多设备，支持团队共享。",
+    pro: ProService.YES,
   },
 ];
 
@@ -44,15 +44,14 @@ export const ServicesSection = () => {
   return (
     <section id="services" className="container py-24 sm:py-32">
       <h2 className="text-lg text-primary text-center mb-2 tracking-wider">
-        Services
+        应用场景
       </h2>
 
       <h2 className="text-3xl md:text-4xl text-center font-bold mb-4">
-        Grow Your Business
+        让输入、创作与 AI 融合
       </h2>
       <h3 className="md:w-1/2 mx-auto text-xl text-center text-muted-foreground mb-8">
-        From marketing and sales to operations and strategy, we have the
-        expertise to help you achieve your goals.
+        写作、代码、翻译、团队协作都能在同一输入框完成，从预编辑到 AI 回复一气呵成。
       </h3>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
