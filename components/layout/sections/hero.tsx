@@ -16,7 +16,7 @@ export const HeroSection = () => {
           </Badge>
 
           <div className="max-w-screen-md mx-auto text-center text-4xl md:text-6xl font-bold">
-            <h1>打造世界最强中文输入法</h1>
+            <h1>打造最强中文输入法</h1>
           </div>
 
           <p className="max-w-screen-sm mx-auto text-xl text-muted-foreground">

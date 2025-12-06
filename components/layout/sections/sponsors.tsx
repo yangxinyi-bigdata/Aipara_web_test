@@ -12,19 +12,19 @@ interface sponsorsProps {
 const sponsors: sponsorsProps[] = [
   {
     icon: "Crown",
-    name: "Rime 生态",
+    name: "Rime生态",
   },
   {
     icon: "Vegan",
-    name: "云端模型",
+    name: "AI对话",
   },
   {
     icon: "Ghost",
-    name: "快捷短语",
+    name: "自定义词库",
   },
   {
     icon: "Puzzle",
-    name: "团队同步",
+    name: "候选词高亮",
   },
   {
     icon: "Squirrel",
@@ -32,7 +32,7 @@ const sponsors: sponsorsProps[] = [
   },
   {
     icon: "Cookie",
-    name: "AI 对话",
+    name: "光标跳转",
   },
   {
     icon: "Drama",

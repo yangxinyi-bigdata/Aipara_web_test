@@ -11,27 +11,27 @@ interface BenefitsProps {
 const benefitList: BenefitsProps[] = [
   {
     icon: "AlignVerticalJustifyCenter",
-    title: "整段拼音不顶屏",
+    title: "标点符号不上屏",
     description:
-      "标点、符号与拼音共存，一次输入整段内容，确认后再上屏，减少频繁中断和回删。",
+      "标点符号，英文与拼音共存，一次输入整段，一次识别整段，减少选词时间。",
   },
   {
     icon: "Search",
     title: "光标搜索与跳转",
     description:
-      "Ctrl/Cmd+F 搜索拼音片段，Tab 循环；支持标点级跳转与点击定位，长段编辑更快。",
+      "字母搜索跳转光标，标点符号跳转光标，长段文本快速编辑。",
   },
   {
     icon: "Languages",
-    title: "中英混输与标点替换",
+    title: "最快速AI对话",
     description:
-      "反引号进入英文模式无需切换输入法，候选可统一中文标点；在 Notion 等场景仍保留英文标点触发快捷键。",
+      "随时发起AI对话，通过特定前缀触发和不同AI助手的对话功能，随时随地和AI宠物，AI秘书，AI翻译对话，效率大爆炸。",
   },
   {
     icon: "Sparkles",
-    title: "AI 转写与多模型候选",
+    title: "AI转写",
     description:
-      "云端/本地多路转换结合历史上下文生成候选词，提高长段拼音转汉字的命中率。",
+      "AI/云端/本地多路实时分析，结合历史上下文生成候选词，提高长段拼音转汉字的命中率。",
   },
 ];
 
@@ -45,10 +45,10 @@ export const BenefitsSection = () => {
           </h2>
 
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Aipara 让长段输入与 AI 结合更高效
+            Aipara 目标是使用AI技术消灭选词
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            围绕“整段输入”“AI 转写”“中英混输”三个场景，提供从光标定位到候选高亮的全链路体验。
+            创造新的"段落输入"范式，使用AI技术一次性从拼音转换到正确的中文，甚至可以顺便完成语言润色。
           </p>
         </div>
 

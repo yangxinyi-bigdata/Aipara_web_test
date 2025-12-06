@@ -36,15 +36,15 @@ interface FeatureProps {
 const routeList: RouteProps[] = [
   {
     href: "#benefits",
-    label: "核心优势",
+    label: "AI深度集成",
   },
   {
     href: "#features",
-    label: "功能总览",
+    label: "功能介绍",
   },
   {
     href: "#pricing",
-    label: "版本计划",
+    label: "立即下载",
   },
   {
     href: "#faq",
@@ -58,16 +58,16 @@ const routeList: RouteProps[] = [
 
 const featureList: FeatureProps[] = [
   {
-    title: "段落输入 · 整段不顶屏",
-    description: "标点与拼音共存，一次完成整段输入，减少中断与回删。",
+    title: "段落输入 · 一次输入一段",
+    description: "无论中文，英文，标点符号，一刻不停一次输入完成。",
   },
   {
-    title: "中英混输 · 反引号切换",
-    description: "不用切换输入模式，反引号即可进入英文，保持思路连贯。",
+    title: "AI识别拼音 · 省心输入效率超高",
+    description: "AI拼音转换，将一整个段落的拼音一次性转换成中文，准确率高，告别选词。",
   },
   {
-    title: "AI 转写 · 多模型候选",
-    description: "云端/多模型并行转写，结合历史上下文提高命中率。",
+    title: "AI对话 · 自定义AI助手候选",
+    description: "AI猫娘，AI女友，AI秘书，AI翻译极速对话。",
   },
 ];
 
@@ -180,7 +180,7 @@ export const Navbar = () => {
         <Button asChild size="sm" variant="ghost" aria-label="立即下载">
           <Link
             aria-label="立即下载"
-            href="#contact"
+            href="#pricing"
             target="_self"
           >
             <Download className="size-5" />
