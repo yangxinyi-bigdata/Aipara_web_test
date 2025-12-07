@@ -10,16 +10,22 @@ interface FeaturesProps {
 
 const featureList: FeaturesProps[] = [
   {
-    icon: "Languages",
-    title: "反引号中英混输",
+    icon: "ScrollText",
+    title: "段落输入",
     description:
-      "在拼音中插入`英文`片段，无需切换输入法状态，保持创作节奏不中断。",
+      "AI段落输入法的终极目标是消灭选词，一次性输入一整个段落，段落中不只是中文，可以包含英文和标点符号等任意内容。",
+  },
+  {
+    icon: "Languages",
+    title: "跨语种输入",
+    description:
+      "输入拼音，可以直接获取到任意语言的候选词。或者在AI翻译助手当中实现输入拼音，同时完成双语输入。",
   },
   {
     icon: "ClipboardPaste",
-    title: "粘贴模式直连 AI",
+    title: "AI拼音识别",
     description:
-      "将代码/长文本以纯文本注入预编辑框，直接询问内置 AI，减少重复敲字。",
+      "开发段落输入法的初衷：某天突然产生一个灵感，有没有可能直接将拼音发送给AI，让AI去猜测我们输入的是什么中文?",
   },
   {
     icon: "History",
@@ -27,23 +33,18 @@ const featureList: FeaturesProps[] = [
     description:
       "切换应用后可恢复上一段未上屏文本，长段输入不再丢失。",
   },
-  {
-    icon: "ScrollText",
-    title: "候选滚动与差异高亮",
-    description:
-      "长候选自动滚动，差异位高亮标记，让长段候选的细微差别一眼可见。",
-  },
+
   {
     icon: "Sparkles",
-    title: "AI 多模型并行",
+    title: "快捷AI对话",
     description:
-      "云端/本地多路转换生成候选，结合上下文提高命中率，可按需选择上屏。",
+      "创造性的是有特定前缀触发和不同AI助手的对话功能，并且还可以设置持续对话，无需输入前缀直接持续和特定ai助手连续对话。",
   },
   {
     icon: "Search",
-    title: "光标搜索跳转",
+    title: "网页渲染",
     description:
-      "Ctrl/Cmd+F 搜索拼音片段，Tab 在结果间跳转；亦可按标点分句跳转。",
+      "跳出输入法范筹，在AI对话时直接生成临时网页渲染AI回复文本，不再收到输入法框架限制。",
   },
 ];
 
@@ -59,7 +60,7 @@ export const FeaturesSection = () => {
       </h2>
 
       <h3 className="md:w-1/2 mx-auto text-xl text-center text-muted-foreground mb-8">
-        围绕长段输入、AI 转写、中英混输和候选呈现，提供全链路体验；保持 Rime 的可定制性，并加入云端扩展能力。
+        在AI时代重新思考，有没有可能利用AI全面重塑输入法输入体验，甚至极大的提高输入效率? 基于这个思考我大幅度重构了输入法的逻辑。
       </h3>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">

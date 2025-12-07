@@ -76,9 +76,12 @@ const featureList: FeatureProps[] = [
 export const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   return (
-    <header className="shadow-inner bg-opacity-15 w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl top-5 mx-auto sticky border border-secondary z-40 rounded-2xl flex justify-between items-center p-2 bg-card">
-      <Link href="/" className="font-bold text-lg flex items-center">
-        <ChevronsDown className="bg-gradient-to-tr border-secondary from-primary via-primary/70 to-primary rounded-lg w-9 h-9 mr-2 border text-white" />
+    <header className="shadow-inner bg-opacity-15 w-[95%] md:w-[85%] lg:w-[85%] lg:max-w-screen-xl top-5 mx-auto sticky border border-secondary z-40 rounded-2xl flex justify-between items-center gap-4 p-2 bg-card">
+      <Link
+        href="/"
+        className="font-bold text-lg flex items-center gap-2 whitespace-nowrap flex-shrink-0"
+      >
+        <ChevronsDown className="bg-gradient-to-tr border-secondary from-primary via-primary/70 to-primary rounded-lg w-9 h-9 mr-2 border text-white shrink-0 aspect-square" />
         AI段落输入法
       </Link>
       {/* <!-- Mobile --> */}
@@ -130,8 +133,8 @@ export const Navbar = () => {
       </div>
 
       {/* <!-- Desktop --> */}
-      <NavigationMenu className="hidden lg:block mx-auto">
-        <NavigationMenuList>
+      <NavigationMenu className="hidden lg:flex flex-1 min-w-0 justify-center ml-6">
+        <NavigationMenuList className="justify-center gap-2 whitespace-nowrap">
           <NavigationMenuItem>
             <NavigationMenuTrigger className="bg-card text-base">
               功能亮点
@@ -177,7 +180,7 @@ export const Navbar = () => {
         </NavigationMenuList>
       </NavigationMenu>
 
-      <div className="hidden lg:flex">
+      <div className="hidden lg:flex flex-shrink-0 items-center gap-1 ml-6">
         <ToggleTheme />
 
         <Button asChild size="sm" variant="ghost" aria-label="立即下载">

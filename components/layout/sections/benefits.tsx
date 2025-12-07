@@ -11,27 +11,28 @@ interface BenefitsProps {
 const benefitList: BenefitsProps[] = [
   {
     icon: "AlignVerticalJustifyCenter",
-    title: "标点符号不上屏",
+    title: "整段内容一次性输入",
     description:
-      "标点符号，英文与拼音共存，一次输入整段，一次识别整段，减少选词时间。",
+      "拼音与标点符号，英文共存，一次输入整段，一次识别整段，减少选词时间。",
   },
-  {
-    icon: "Search",
-    title: "光标搜索与跳转",
+    {
+    icon: "Sparkles",
+    title: "AI转写",
     description:
-      "字母搜索跳转光标，标点符号跳转光标，长段文本快速编辑。",
-  },
+      "AI/云端/本地多路实时分析，结合历史上下文生成候选词，提高长段拼音转汉字的命中率。",
+  },  
   {
     icon: "Languages",
     title: "最快速AI对话",
     description:
       "随时发起AI对话，通过特定前缀触发和不同AI助手的对话功能，随时随地和AI宠物，AI秘书，AI翻译对话，效率大爆炸。",
   },
+
   {
-    icon: "Sparkles",
-    title: "AI转写",
+    icon: "Search",
+    title: "光标搜索与跳转",
     description:
-      "AI/云端/本地多路实时分析，结合历史上下文生成候选词，提高长段拼音转汉字的命中率。",
+      "字母搜索跳转光标，标点符号跳转光标，长段文本快速编辑。",
   },
 ];
 
