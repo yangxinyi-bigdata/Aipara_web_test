@@ -25,7 +25,7 @@ export const HeroSection = () => {
 
           <div className="space-y-4 md:space-y-0 md:space-x-4">
             <Button asChild className="w-5/6 md:w-1/4 font-bold group/arrow">
-              <Link href="#pricing">
+              <Link href="#download">
                 立即下载
               </Link>
             </Button>

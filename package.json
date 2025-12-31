@@ -12,7 +12,7 @@
     "call:hello": "node scripts/call-hello-world.mjs"
   },
   "dependencies": {
-    "@cloudbase/js-sdk": "^2.22.9",
+    "@cloudbase/js-sdk": "^2.24.3",
     "@cloudbase/node-sdk": "^3.14.2",
     "@devnomic/marquee": "^1.0.2",
     "@hookform/resolvers": "^3.9.0",

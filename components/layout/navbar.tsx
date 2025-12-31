@@ -45,7 +45,7 @@ const routeList: RouteProps[] = [
     label: "功能介绍",
   },
   {
-    href: "#pricing",
+    href: "#download",
     label: "立即下载",
   },
   {
@@ -134,9 +134,9 @@ export const Navbar = () => {
 
       {/* <!-- Desktop --> */}
       <NavigationMenu className="hidden lg:flex flex-1 min-w-0 justify-center ml-6">
-        <NavigationMenuList className="justify-center gap-2 whitespace-nowrap">
+        <NavigationMenuList className="justify-center gap-1 whitespace-nowrap">
           <NavigationMenuItem>
-            <NavigationMenuTrigger className="bg-card text-base">
+            <NavigationMenuTrigger className="text-base px-2">
               功能亮点
             </NavigationMenuTrigger>
             <NavigationMenuContent>
@@ -171,7 +171,7 @@ export const Navbar = () => {
             <NavigationMenuItem key={href}>
               <NavigationMenuLink
                 asChild
-                className={cn(navigationMenuTriggerStyle(), "text-base px-3")}
+                className={cn(navigationMenuTriggerStyle(), "text-base px-2")}
               >
                 <Link href={href}>{label}</Link>
               </NavigationMenuLink>
@@ -186,7 +186,7 @@ export const Navbar = () => {
         <Button asChild size="sm" variant="ghost" aria-label="立即下载">
           <Link
             aria-label="立即下载"
-            href="#pricing"
+            href="#download"
             target="_self"
           >
             <Download className="size-5" />

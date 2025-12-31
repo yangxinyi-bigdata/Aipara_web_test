@@ -73,7 +73,7 @@ export const ContactSection = () => {
             <h2 className="text-3xl md:text-4xl font-bold">聊聊 Aipara</h2>
           </div>
           <p className="mb-8 text-muted-foreground lg:w-5/6">
-            想要下载、申请内测或企业定制词库？留下信息，我们会尽快联系你。
+            技术咨询、内测、词库定制、高级功能开发？留下信息，我们会尽快联系你。
           </p>
 
           <div className="flex flex-col gap-4">
@@ -83,7 +83,7 @@ export const ContactSection = () => {
                 <div className="font-bold">我们在</div>
               </div>
 
-              <div>线上团队 · 远程办公</div>
+              <div>线上团队</div>
             </div>
 
             <div>
@@ -101,7 +101,7 @@ export const ContactSection = () => {
                 <div className="font-bold">邮箱</div>
               </div>
 
-              <div>team@aipara.app</div>
+              <div>yangxinyigo@icloud.com</div>
             </div>
 
             <div>

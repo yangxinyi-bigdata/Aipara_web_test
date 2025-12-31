@@ -19,24 +19,24 @@ const serviceList: ServiceProps[] = [
   {
     title: "写作与长段输入",
     description:
-      "整段拼音不顶屏，支持标点共存、光标搜索/跳转，适合长文与笔记场景。",
+      "段落输入一次性完成一段编辑，AI加速识别，减少选词，适合长文与笔记场景。",
     pro: ProService.NO,
   },
   {
-    title: "AI 转写与多模型候选",
+    title: "翻译与双语写作",
     description:
-      "云端/本地模型并行生成候选，提高命中率，可按需选择上屏。",
-    pro: ProService.YES,
+      "输入拼音直接输出英文，输入拼音直接输出双语，输入拼音直接完成语言润色，减少中间环节，增加效率。",
+    pro: ProService.NO,
   },
   {
-    title: "提示词与角色预设",
-    description: "前缀触发不同 AI 助手，适配写作、翻译、代码讲解等场景。",
-    pro: ProService.YES,
+    title: "AI秘书AI猫娘",
+    description: "前缀触发不同 AI 助手，情感连接、翻译、事务管理，代码讲解等场景。",
+    pro: ProService.NO,
   },
   {
-    title: "团队词库与云同步",
-    description: "统一词库、快捷短语与配置，同步到多设备，支持团队共享。",
-    pro: ProService.YES,
+    title: "频繁AI对话需求",
+    description: "随时随地和AI对话，AI搜索，AI查找。",
+    pro: ProService.NO,
   },
 ];
 
@@ -51,7 +51,7 @@ export const ServicesSection = () => {
         让输入、创作与 AI 融合
       </h2>
       <h3 className="md:w-1/2 mx-auto text-xl text-center text-muted-foreground mb-8">
-        写作、代码、翻译、团队协作都能在同一输入框完成，从预编辑到 AI 回复一气呵成。
+        输入法可能是AI对话最好的入口，写作、代码、翻译随时随地对话，一气呵成。
       </h3>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 

@@ -7,125 +7,127 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Check } from "lucide-react";
+import { ArrowDownToLine, Check, Laptop, Monitor } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-enum PopularPlan {
-  NO = 0,
-  YES = 1,
-}
-
-interface PlanProps {
-  title: string;
-  popular: PopularPlan;
-  price: number;
-  description: string;
+interface DownloadInfo {
+  os: string;
+  variant: string;
+  version: string;
+  size: string;
+  highlights: string[];
   buttonText: string;
-  benefitList: string[];
+  secondaryText: string;
+  Icon: LucideIcon;
 }
 
-const plans: PlanProps[] = [
+const downloads: DownloadInfo[] = [
   {
-    title: "基础版",
-    popular: PopularPlan.NO,
-    price: 0,
-    description: "体验整段输入、中英混输与基础 AI 转写。",
-    buttonText: "开始体验",
-    benefitList: [
-      "整段拼音不顶屏",
-      "标点/拼音共存",
-      "反引号中英混输",
-      "单模型 AI 转写",
-      "社区支持",
+    os: "macOS",
+    variant: "Apple Silicon / Intel · 适配 macOS 12+",
+    version: "v1.2.0 · 最近更新",
+    size: "DMG · 120 MB",
+    highlights: [
+      "全局唤起快捷键与候选联想提示",
+      "兼容 Spotlight / Alfred 工作流，不干扰常用启动器",
+      "自动更新与崩溃日志上报，便于问题追踪",
     ],
+    buttonText: "下载 macOS 版",
+    secondaryText: "查看安装指南",
+    Icon: Laptop,
   },
   {
-    title: "专业版",
-    popular: PopularPlan.YES,
-    price: 29,
-    description: "多模型候选、粘贴模式、提示词预设与候选差异高亮。",
-    buttonText: "升级专业版",
-    benefitList: [
-      "多模型并行转写",
-      "粘贴模式直连 AI",
-      "候选滚动与差异高亮",
-      "提示词/角色预设",
-      "优先支持",
+    os: "Windows",
+    variant: "Windows 10 / 11 · 64 位",
+    version: "v1.2.0 · 最近更新",
+    size: "EXE · 105 MB",
+    highlights: [
+      "覆盖 Win32 / UWP 输入框，保持段落级输入体验",
+      "剪贴板直连模式，长文本转写不卡顿",
+      "企业网络代理配置，便捷接入内网环境",
     ],
-  },
-  {
-    title: "团队版",
-    popular: PopularPlan.NO,
-    price: 59,
-    description: "团队词库与配置同步，分角色配额与协作支持。",
-    buttonText: "联系我们",
-    benefitList: [
-      "团队词库/短语同步",
-      "多设备配置下发",
-      "自定义角色/配额",
-      "邮箱/电话支持",
-      "优先内测通道",
-    ],
+    buttonText: "下载 Windows 版",
+    secondaryText: "安装常见问题",
+    Icon: Monitor,
   },
 ];
 
 export const PricingSection = () => {
   return (
-    <section id="pricing" className="container py-24 sm:py-32">
+    <section id="download" className="container py-24 sm:py-32">
       <h2 className="text-lg text-primary text-center mb-2 tracking-wider">
-        版本计划
+        下载 Aipara 输入法
       </h2>
 
       <h2 className="text-3xl md:text-4xl text-center font-bold mb-4">
-        按需选择适合你的输入体验
+        选择你的系统，立即开始流畅输入
       </h2>
 
-      <h3 className="md:w-1/2 mx-auto text-xl text-center text-muted-foreground pb-14">
-        先用基础版上手，再按需求升级，团队版支持共享词库与配置。
+      <h3 className="md:w-2/3 mx-auto text-xl text-center text-muted-foreground pb-12">
+        提供 macOS 与 Windows 双版本。当前版本覆盖最新功能，后续自动更新。
       </h3>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-4">
-        {plans.map(
-          ({ title, popular, price, description, buttonText, benefitList }) => (
-            <Card
-              key={title}
-              className={
-                popular === PopularPlan?.YES
-                  ? "drop-shadow-xl shadow-black/10 dark:shadow-white/10 border-[1.5px] border-primary lg:scale-[1.1]"
-                  : ""
-              }
-            >
-              <CardHeader>
-                <CardTitle className="pb-2">{title}</CardTitle>
-
-                <CardDescription className="pb-4">
-                  {description}
-                </CardDescription>
-
-                <div>
-                  <span className="text-3xl font-bold">¥{price}</span>
-                  <span className="text-muted-foreground"> /月</span>
+      <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+        {downloads.map(
+          ({
+            os,
+            variant,
+            version,
+            size,
+            highlights,
+            buttonText,
+            secondaryText,
+            Icon,
+          }) => (
+            <Card key={os} className="h-full border-[1.5px]">
+              <CardHeader className="flex flex-row items-start justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-xl bg-primary/10 text-primary p-2">
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-2xl">{os} 版</CardTitle>
+                    <CardDescription className="text-sm mt-1">
+                      {variant}
+                    </CardDescription>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-semibold text-foreground">
+                    {version}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">{size}</p>
                 </div>
               </CardHeader>
 
-              <CardContent className="flex">
-                <div className="space-y-4">
-                  {benefitList.map((benefit) => (
-                    <span key={benefit} className="flex">
-                      <Check className="text-primary mr-2" />
-                      <h3>{benefit}</h3>
-                    </span>
-                  ))}
+              <CardContent className="space-y-5">
+                <div className="flex flex-wrap gap-2 text-xs font-medium text-muted-foreground">
+                  <span className="rounded-full bg-primary/5 text-primary px-3 py-1">
+                    官方构建
+                  </span>
+                  <span className="rounded-full bg-muted px-3 py-1">
+                    {variant}
+                  </span>
+                  <span className="rounded-full bg-muted px-3 py-1">{size}</span>
                 </div>
+
+                <ul className="space-y-3 text-sm text-foreground">
+                  {highlights.map((item) => (
+                    <li key={item} className="flex gap-2 items-start">
+                      <Check className="h-4 w-4 text-primary mt-[2px]" />
+                      <span className="leading-relaxed">{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </CardContent>
 
-              <CardFooter>
-                <Button
-                  variant={
-                    popular === PopularPlan?.YES ? "default" : "secondary"
-                  }
-                  className="w-full"
-                >
+              <CardFooter className="flex flex-wrap gap-3">
+                <Button className="flex-1 min-w-[200px]">
+                  <ArrowDownToLine className="mr-2 h-4 w-4" />
                   {buttonText}
+                </Button>
+                <Button variant="ghost" className="text-sm">
+                  {secondaryText}
                 </Button>
               </CardFooter>
             </Card>

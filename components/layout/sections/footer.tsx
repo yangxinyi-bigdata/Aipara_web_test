@@ -19,7 +19,7 @@ export const FooterSection = () => {
             <h3 className="font-bold text-lg">链接</h3>
             <div>
               <Link href="#" className="opacity-60 hover:opacity-100">
-                下载
+                视频教程
               </Link>
             </div>
 
@@ -28,16 +28,10 @@ export const FooterSection = () => {
                 帮助文档
               </Link>
             </div>
-
-            <div>
-              <Link href="#" className="opacity-60 hover:opacity-100">
-                视频教程
-              </Link>
-            </div>
           </div>
 
           <div className="flex flex-col gap-2">
-            <h3 className="font-bold text-lg">平台</h3>
+            <h3 className="font-bold text-lg">下载</h3>
             <div>
               <Link href="#" className="opacity-60 hover:opacity-100">
                 Windows
@@ -46,13 +40,7 @@ export const FooterSection = () => {
 
             <div>
               <Link href="#" className="opacity-60 hover:opacity-100">
-                macOS
-              </Link>
-            </div>
-
-            <div>
-              <Link href="#" className="opacity-60 hover:opacity-100">
-                Linux
+                Mac
               </Link>
             </div>
           </div>
@@ -60,20 +48,14 @@ export const FooterSection = () => {
           <div className="flex flex-col gap-2">
             <h3 className="font-bold text-lg">帮助</h3>
             <div>
-              <Link href="#" className="opacity-60 hover:opacity-100">
+              <Link href="#contact" className="opacity-60 hover:opacity-100">
                 联系我们
               </Link>
             </div>
 
             <div>
-              <Link href="#" className="opacity-60 hover:opacity-100">
+              <Link href="#faq" className="opacity-60 hover:opacity-100">
                 常见问题
-              </Link>
-            </div>
-
-            <div>
-              <Link href="#" className="opacity-60 hover:opacity-100">
-                反馈
               </Link>
             </div>
           </div>
@@ -88,12 +70,6 @@ export const FooterSection = () => {
 
             <div>
               <Link href="#" className="opacity-60 hover:opacity-100">
-                Discord
-              </Link>
-            </div>
-
-            <div>
-              <Link href="#" className="opacity-60 hover:opacity-100">
                 博客
               </Link>
             </div>
@@ -103,7 +79,7 @@ export const FooterSection = () => {
         <Separator className="my-6" />
         <section className="">
           <h3 className="">
-            &copy; 2024 Aipara 输入法 · Rime 二次开发与 AI 深度集成
+            &copy; 2025 Aipara 输入法 · 与 AI 深度集成
           </h3>
         </section>
       </div>
