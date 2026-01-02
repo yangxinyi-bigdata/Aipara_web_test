@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
+const isProd = process.env.NODE_ENV === "production";
+
 const nextConfig = {
-  output: 'export', // 关键：启用静态导出
+  ...(isProd ? { output: "export" } : {}),
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -17,6 +19,15 @@ const nextConfig = {
         hostname: "github.com",
       },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/__auth/:path*",
+        destination:
+          "https://aipara.yangxinyi.site/__auth/:path*",
+      },
+    ];
   },
 };
 
