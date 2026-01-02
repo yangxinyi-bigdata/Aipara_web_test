@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Sora } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { Navbar } from "@/components/layout/navbar";
+import { NavbarShell } from "@/components/layout/navbar-shell";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 const sora = Sora({
   subsets: ["latin"],
@@ -29,7 +29,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
+          <NavbarShell />
 
           {children}
         </ThemeProvider>

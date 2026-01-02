@@ -391,6 +391,9 @@ const PasswordPage = () => {
               <Link className="block text-foreground" href="/account/password">
                 设置密码
               </Link>
+              <Link className="block" href="/account/bindings">
+                绑定信息
+              </Link>
             </div>
             <Button asChild className="mt-6 w-full" variant="secondary">
               <Link href="/">返回首页</Link>
