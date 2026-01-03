@@ -12,7 +12,7 @@ import { getCloudbaseClient } from "@/lib/cloudbase";
 import { formatPhoneForDisplay, normalizePhoneForApi } from "@/lib/phone";
 
 type LoginMode = "password" | "code";
-type IdentifierType = "phone" | "email" | "username";
+type IdentifierType = "phone" | "email" | "invalid";
 
 type IdentifierInfo = {
   type: IdentifierType;
@@ -54,7 +54,7 @@ const parseMeta = (meta: unknown) => {
 const parseIdentifier = (value: string): IdentifierInfo => {
   const raw = value.trim();
   if (!raw) {
-    return { type: "username", raw: "", normalized: "", display: "" };
+    return { type: "invalid", raw: "", normalized: "", display: "" };
   }
   if (raw.includes("@")) {
     const email = raw.toLowerCase();
@@ -70,7 +70,7 @@ const parseIdentifier = (value: string): IdentifierInfo => {
       display: formatPhoneForDisplay(normalized),
     };
   }
-  return { type: "username", raw, normalized: raw, display: raw };
+  return { type: "invalid", raw, normalized: "", display: raw };
 };
 
 const sanitizeRedirect = (target: string | null) => {
@@ -171,7 +171,11 @@ const LoginPage = () => {
 
   const handlePasswordLogin = async () => {
     resetMessages();
-    if (!identifierInfo.normalized || !password) {
+    if (identifierInfo.type === "invalid") {
+      setErrorMessage("请输入手机号或邮箱。");
+      return;
+    }
+    if (!password) {
       setErrorMessage("请输入账号与密码。");
       return;
     }
@@ -203,8 +207,8 @@ const LoginPage = () => {
       setErrorMessage("请输入手机号或邮箱。");
       return;
     }
-    if (identifierInfo.type === "username") {
-      setErrorMessage("验证码登录仅支持手机号或邮箱。");
+    if (identifierInfo.type === "invalid") {
+      setErrorMessage("请输入有效手机号或邮箱。");
       return;
     }
     const client = getCloudbaseClient();
@@ -387,7 +391,7 @@ const LoginPage = () => {
 
             <div className="mt-6 grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="identifier">手机号 / 邮箱 / 用户名</Label>
+                <Label htmlFor="identifier">手机号 / 邮箱</Label>
                 <Input
                   id="identifier"
                   value={identifier}
@@ -452,11 +456,6 @@ const LoginPage = () => {
               </Button>
             </div>
 
-            <div className="mt-6 flex items-center justify-end text-xs text-muted-foreground">
-              <Link className="text-primary" href="/account/password">
-                设置登录密码
-              </Link>
-            </div>
           </section>
         </div>
       </div>

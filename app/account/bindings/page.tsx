@@ -549,12 +549,6 @@ const BindingsPage = () => {
               <Link className="block" href="/account">
                 账号信息
               </Link>
-              <Link className="block" href="/account/password">
-                安全设置
-              </Link>
-              <Link className="block text-foreground" href="/account/bindings">
-                绑定信息
-              </Link>
               <Link className="block" href="/account/subscription">
                 订阅管理
               </Link>

@@ -100,56 +100,6 @@ export const AccountNavbar = () => {
         <ChevronsDown className="bg-gradient-to-tr border-secondary from-primary via-primary/70 to-primary rounded-lg w-9 h-9 mr-2 border text-white shrink-0 aspect-square" />
         AI段落输入法
       </Link>
-      <nav className="hidden lg:flex flex-1 items-center justify-center gap-6 text-sm text-muted-foreground">
-        <Link
-          className={cn(
-            "transition-colors hover:text-foreground",
-            pathname === "/account" && "text-foreground"
-          )}
-          href="/account"
-        >
-          账号信息
-        </Link>
-        <Link
-          className={cn(
-            "transition-colors hover:text-foreground",
-            pathname === "/account/password" && "text-foreground"
-          )}
-          href="/account/password"
-        >
-          安全设置
-        </Link>
-        <Link
-          className={cn(
-            "transition-colors hover:text-foreground",
-            pathname === "/account/bindings" && "text-foreground"
-          )}
-          href="/account/bindings"
-        >
-          绑定信息
-        </Link>
-        <Link
-          className={cn(
-            "transition-colors hover:text-foreground",
-            pathname === "/account/subscription" && "text-foreground"
-          )}
-          href="/account/subscription"
-        >
-          订阅管理
-        </Link>
-        <Link
-          className={cn(
-            "transition-colors hover:text-foreground",
-            pathname === "/account/wallet" && "text-foreground"
-          )}
-          href="/account/wallet"
-        >
-          钱包管理
-        </Link>
-        <Link className="transition-colors hover:text-foreground" href="/">
-          返回首页
-        </Link>
-      </nav>
       <div className="ml-auto flex items-center gap-2">
         {!currentUser ? (
           <Button size="sm" variant="secondary" onClick={handleLogin}>
