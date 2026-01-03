@@ -3,7 +3,18 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogIn, Mail, Phone, ShieldCheck, User } from "lucide-react";
+import {
+  ArrowUpRight,
+  CalendarClock,
+  Gauge,
+  LogIn,
+  Mail,
+  Phone,
+  ShieldCheck,
+  Sparkles,
+  User,
+  Wallet,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getCloudbaseClient, type CloudbaseClient } from "@/lib/cloudbase";
@@ -148,6 +159,18 @@ const AccountPage = () => {
     typeof profileMeta.phone === "string" ? profileMeta.phone : "";
   const resolvedEmail = currentUser?.email || metaEmail;
   const resolvedPhone = phoneNumber || metaPhone;
+  const entitlementPlan = {
+    tier: "Pro",
+    status: "试用中",
+    expiresAt: "2025-06-30",
+    cycle: "月付",
+    autoRenew: true,
+  };
+  const usageItems = [
+    { label: "对话次数", used: 128, limit: 500, unit: "次" },
+    { label: "点数", used: 3600, limit: 10000, unit: "点" },
+    { label: "高级模型调用", used: 18, limit: 60, unit: "次" },
+  ];
 
   return (
     <main className="min-h-screen bg-background">
@@ -172,6 +195,12 @@ const AccountPage = () => {
               </Link>
               <Link className="block" href="/account/bindings">
                 绑定信息
+              </Link>
+              <Link className="block" href="/account/subscription">
+                订阅管理
+              </Link>
+              <Link className="block" href="/account/wallet">
+                钱包管理
               </Link>
             </div>
             <Button asChild className="mt-6 w-full" variant="secondary">
@@ -310,6 +339,103 @@ const AccountPage = () => {
                 <Button asChild variant="secondary">
                   <Link href="/account/bindings">前往设置</Link>
                 </Button>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-secondary/60 bg-card/80 p-6">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-secondary bg-muted/40">
+                  <Sparkles className="size-5 text-foreground" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold">权益管理</h2>
+                  <p className="text-sm text-muted-foreground">
+                    查看订阅与用量，并快速进入管理页。
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+                <div className="grid gap-4">
+                  <div className="rounded-xl border border-secondary/40 bg-muted/20 p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          AI 权益卡
+                        </p>
+                        <p className="text-lg font-semibold mt-2">
+                          {entitlementPlan.tier} · {entitlementPlan.status}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {entitlementPlan.cycle} ·{" "}
+                          {entitlementPlan.autoRenew ? "自动续费开启" : "自动续费关闭"}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <CalendarClock className="size-4" />
+                        到期 {entitlementPlan.expiresAt}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-secondary/40 bg-muted/10 p-5">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Gauge className="size-4" />
+                      本月用量摘要
+                    </div>
+                    <div className="mt-4 space-y-4">
+                      {usageItems.map((item) => {
+                        const percent = Math.min(
+                          100,
+                          Math.round((item.used / item.limit) * 100)
+                        );
+                        return (
+                          <div key={item.label}>
+                            <div className="flex items-center justify-between text-sm">
+                              <span>{item.label}</span>
+                              <span className="text-muted-foreground">
+                                {item.used}/{item.limit}
+                                {item.unit}
+                              </span>
+                            </div>
+                            <div className="mt-2 h-2 rounded-full bg-muted">
+                              <div
+                                className="h-2 rounded-full bg-primary"
+                                style={{ width: `${percent}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid gap-4">
+                  <div className="rounded-xl border border-secondary/40 bg-muted/20 p-5">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Wallet className="size-4" />
+                      快捷入口
+                    </div>
+                    <div className="mt-4 grid gap-3">
+                      <Button asChild>
+                        <Link href="/account/subscription">
+                          管理订阅
+                          <ArrowUpRight className="ml-2 size-4" />
+                        </Link>
+                      </Button>
+                      <Button asChild variant="secondary">
+                        <Link href="/account/wallet">
+                          钱包管理
+                          <ArrowUpRight className="ml-2 size-4" />
+                        </Link>
+                      </Button>
+                      <p className="text-xs text-muted-foreground">
+                        展示示例数据，后续可对接真实订阅与用量服务。
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </section>

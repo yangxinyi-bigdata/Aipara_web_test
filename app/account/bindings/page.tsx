@@ -550,10 +550,16 @@ const BindingsPage = () => {
                 账号信息
               </Link>
               <Link className="block" href="/account/password">
-                设置密码
+                安全设置
               </Link>
               <Link className="block text-foreground" href="/account/bindings">
                 绑定信息
+              </Link>
+              <Link className="block" href="/account/subscription">
+                订阅管理
+              </Link>
+              <Link className="block" href="/account/wallet">
+                钱包管理
               </Link>
             </div>
             <Button asChild className="mt-6 w-full" variant="secondary">
