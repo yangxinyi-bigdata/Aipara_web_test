@@ -25,6 +25,7 @@ import Image from "next/image";
 import { ToggleTheme } from "./toogle-theme";
 import { cn } from "@/lib/utils";
 import { getCloudbaseClient, type CloudbaseClient } from "@/lib/cloudbase";
+import { callProfileService } from "@/lib/profile-service";
 import { getUserPhone, normalizePhoneForApi } from "@/lib/phone";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useRouter } from "next/navigation";
@@ -94,25 +95,6 @@ const getDisplayName = (user: CurrentUser) => {
   );
 };
 
-const parseMeta = (meta: unknown) => {
-  if (!meta) return {};
-  if (typeof meta === "string") {
-    try {
-      return JSON.parse(meta) as Record<string, unknown>;
-    } catch (error) {
-      console.warn("Failed to parse user_profile.meta", error);
-      return {};
-    }
-  }
-  if (typeof meta === "object") {
-    return meta as Record<string, unknown>;
-  }
-  return {};
-};
-
-const toMysqlDateTime = (date: Date) =>
-  date.toISOString().slice(0, 19).replace("T", " ");
-
 const buildBaseMeta = (user: CurrentUser) => {
   const phone = getUserPhone(user);
   const phoneE164 = phone ? normalizePhoneForApi(phone) : "";
@@ -125,71 +107,30 @@ const buildBaseMeta = (user: CurrentUser) => {
   };
 };
 
-const buildProfilePayload = (
-  user: CurrentUser,
-  existingMeta: Record<string, unknown>
-) => {
+const buildProfilePayload = (user: CurrentUser) => {
   if (!user) return null;
   const baseMeta = buildBaseMeta(user);
-  const mergedMeta = {
-    ...existingMeta,
-    ...baseMeta,
-  };
-
   const phone = getUserPhone(user);
 
   return {
-    payload: {
-      display_name: getDisplayName(user),
-      avatar_url: user.picture || "",
-      email: user.email || null,
-      phone: phone || null,
-      last_login_at: toMysqlDateTime(new Date()),
-      meta: JSON.stringify(mergedMeta),
-    },
-    meta: mergedMeta,
+    display_name: getDisplayName(user),
+    avatar_url: user.picture || "",
+    email: user.email || null,
+    phone: phone || null,
+    meta: baseMeta,
   };
 };
 
-const syncUserProfile = async (
-  db: CloudbaseClient["db"],
-  user: CurrentUser
-) => {
+const syncUserProfile = async (client: CloudbaseClient, user: CurrentUser) => {
   if (!user) return;
-  const { data, error: queryError } = await db
-    .from("user_profile")
-    .select("meta")
-    .eq("uid", user.uid)
-    .eq("owner", user.uid)
-    .limit(1);
-
-  if (queryError) {
-    console.error("Failed to query user_profile", queryError);
-  }
-
-  const existingMeta = parseMeta(data?.[0]?.meta);
-  const profilePayload = buildProfilePayload(user, existingMeta);
-
+  const profilePayload = buildProfilePayload(user);
   if (!profilePayload) return;
-
-  const { error } = await db.from("user_profile").upsert(
-    {
-      owner: user.uid,
-      uid: user.uid,
-      role: "user",
-      status: 1,
-      ...profilePayload.payload,
-    },
-    {
-      onConflict: "uid",
-    }
+  const result = await callProfileService(
+    "profile.sync",
+    profilePayload,
+    client
   );
-
-  if (error) {
-    console.error("Failed to upsert user_profile", error);
-  }
-
-  return profilePayload.meta;
+  return (result as { meta?: Record<string, unknown> } | null)?.meta ?? null;
 };
 
 
@@ -233,7 +174,7 @@ export const Navbar = () => {
           setCurrentUser(user);
         }
 
-        const meta = await syncUserProfile(client.db, user);
+        const meta = await syncUserProfile(client, user);
         if (
           meta &&
           meta["password_set"] !== true &&
@@ -262,7 +203,7 @@ export const Navbar = () => {
           if (isMounted) {
             setCurrentUser(user);
           }
-          const meta = await syncUserProfile(client.db, user);
+          const meta = await syncUserProfile(client, user);
           if (
             meta &&
             meta["password_set"] !== true &&

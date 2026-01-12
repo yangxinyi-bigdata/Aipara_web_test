@@ -429,7 +429,6 @@ const LoginPage = () => {
                     variant="secondary"
                     onClick={handleSendVerification}
                     disabled={isSendingCode}
-                    className="sm:mb-1"
                   >
                     {isSendingCode ? "发送中..." : "发送验证码"}
                   </Button>

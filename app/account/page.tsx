@@ -24,6 +24,37 @@ type CurrentUser = Awaited<
   ReturnType<CloudbaseClient["auth"]["getCurrentUser"]>
 >;
 
+type EntitlementProfile = {
+  meta?: unknown;
+  plan_tier: string | null;
+  subscription_status: string | null;
+  subscription_start_at: string | null;
+  subscription_end_at: string | null;
+  auto_renew: number | boolean | null;
+  points_balance: number | string | null;
+  points_reset_at: string | null;
+  chat_count_total: number | string | null;
+  pro_model_calls_total: number | string | null;
+};
+
+type SubscriptionRecord = {
+  plan_tier: string | null;
+  status: string | null;
+  start_at: string | null;
+  end_at: string | null;
+  auto_renew: number | boolean | null;
+  points_quota: number | string | null;
+  chat_quota: number | string | null;
+  pro_quota: number | string | null;
+};
+
+type PlanCatalog = {
+  plan_tier: string | null;
+  chat_limit: number | string | null;
+  points_limit: number | string | null;
+  pro_limit: number | string | null;
+};
+
 const getDisplayName = (user: CurrentUser) => {
   if (!user) return "";
   const username = (user as { username?: string }).username || "";
@@ -53,6 +84,68 @@ const parseMeta = (meta: unknown) => {
   return {};
 };
 
+const parseBoolean = (value: unknown) =>
+  value === true ||
+  value === 1 ||
+  value === "1" ||
+  value === "true" ||
+  value === "TRUE";
+
+const parseNumber = (value: unknown) => {
+  if (typeof value === "number") return value;
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
+};
+
+const formatDate = (value: unknown) => {
+  if (!value) return "--";
+  const date = new Date(String(value));
+  if (Number.isNaN(date.getTime())) return String(value);
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const resolveCycle = (startAt: string | null, endAt: string | null) => {
+  if (!startAt || !endAt) return "月付";
+  const start = new Date(startAt);
+  const end = new Date(endAt);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    return "月付";
+  }
+  const diffDays = Math.round(
+    (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  return diffDays >= 300 ? "年付" : "月付";
+};
+
+const planLabelMap: Record<string, string> = {
+  free: "免费版",
+  trial: "试用",
+  pro: "Pro",
+};
+
+const planStatusMap: Record<string, string> = {
+  active: "已生效",
+  trial: "试用中",
+  expired: "已到期",
+  canceled: "已取消",
+  inactive: "未开通",
+};
+
+const planUsageMap: Record<
+  string,
+  { chatLimit: number; pointsLimit: number; proLimit: number }
+> = {
+  free: { chatLimit: 100, pointsLimit: 1000, proLimit: 0 },
+  trial: { chatLimit: 100, pointsLimit: 1000, proLimit: 0 },
+  pro: { chatLimit: 0, pointsLimit: 50000, proLimit: 0 },
+};
+
 const AccountPage = () => {
   const router = useRouter();
   const [currentUser, setCurrentUser] = React.useState<CurrentUser | null>(
@@ -61,6 +154,13 @@ const AccountPage = () => {
   const [isLoading, setIsLoading] = React.useState(true);
   const [profileMeta, setProfileMeta] = React.useState<Record<string, unknown>>(
     {}
+  );
+  const [entitlementProfile, setEntitlementProfile] =
+    React.useState<EntitlementProfile | null>(null);
+  const [latestSubscription, setLatestSubscription] =
+    React.useState<SubscriptionRecord | null>(null);
+  const [planCatalog, setPlanCatalog] = React.useState<PlanCatalog | null>(
+    null
   );
 
   React.useEffect(() => {
@@ -72,30 +172,85 @@ const AccountPage = () => {
       db: CloudbaseClient["db"],
       user: CurrentUser | null
     ) => {
-      if (!user) return;
-      const { data, error } = await db
-        .from("user_profile")
-        .select("meta")
-        .eq("uid", user.uid)
-        .eq("owner", user.uid)
-        .limit(1);
-
-      if (error) {
-        console.warn("Failed to load user_profile meta", error);
+      if (!user) {
+        if (isMounted) {
+          setProfileMeta({});
+          setEntitlementProfile(null);
+          setLatestSubscription(null);
+          setIsLoading(false);
+        }
         return;
       }
 
+      const [profileResult, subscriptionResult] = await Promise.all([
+        db
+          .from("user_profile")
+          .select(
+            "meta,plan_tier,subscription_status,subscription_start_at,subscription_end_at,auto_renew,points_balance,points_reset_at,chat_count_total,pro_model_calls_total"
+          )
+          .eq("uid", user.uid)
+          .eq("owner", user.uid)
+          .limit(1),
+        db
+          .from("user_subscription")
+          .select(
+            "plan_tier,status,start_at,end_at,auto_renew,points_quota,chat_quota,pro_quota"
+          )
+          .eq("uid", user.uid)
+          .order("start_at", { ascending: false })
+          .limit(1),
+      ]);
+
+      if (profileResult.error) {
+        console.warn("Failed to load user_profile", profileResult.error);
+      }
+      if (subscriptionResult.error) {
+        console.warn("Failed to load user_subscription", subscriptionResult.error);
+      }
+
+      const profileRow =
+        (profileResult.data?.[0] as EntitlementProfile | undefined) ?? null;
+      const subscriptionRow =
+        (subscriptionResult.data?.[0] as SubscriptionRecord | undefined) ??
+        null;
+      const planTierRaw =
+        subscriptionRow?.plan_tier ?? profileRow?.plan_tier ?? "free";
+      const planTier = String(planTierRaw || "free").toLowerCase();
+      const catalogTier = planTier === "trial" ? "free" : planTier;
+      let catalogRow: PlanCatalog | null = null;
+
+      if (catalogTier) {
+        const { data, error } = await db
+          .from("plan_catalog")
+          .select("plan_tier,chat_limit,points_limit,pro_limit")
+          .eq("plan_tier", catalogTier)
+          .eq("is_active", 1)
+          .limit(1);
+
+        if (error) {
+          console.warn("Failed to load plan_catalog", error);
+        } else {
+          catalogRow = (data?.[0] as PlanCatalog | undefined) ?? null;
+        }
+      }
+
       if (isMounted) {
-        setProfileMeta(parseMeta(data?.[0]?.meta));
+        setProfileMeta(parseMeta(profileRow?.meta));
+        setEntitlementProfile(profileRow);
+        setLatestSubscription(subscriptionRow);
+        setPlanCatalog(catalogRow);
+        setIsLoading(false);
       }
     };
 
     const loadUser = async () => {
+      if (isMounted) {
+        setIsLoading(true);
+      }
       try {
         const user = await client.auth.getCurrentUser();
         if (isMounted) {
           setCurrentUser(user || null);
-          setIsLoading(false);
         }
         await loadProfile(client.db, user || null);
       } catch (error) {
@@ -119,6 +274,9 @@ const AccountPage = () => {
           await loadProfile(client.db, user || null);
         } catch (error) {
           console.error("Failed to refresh user after sign in", error);
+          if (isMounted) {
+            setIsLoading(false);
+          }
         }
       }
 
@@ -126,6 +284,9 @@ const AccountPage = () => {
         if (isMounted) {
           setCurrentUser(null);
           setProfileMeta({});
+          setEntitlementProfile(null);
+          setLatestSubscription(null);
+          setIsLoading(false);
         }
       }
     });
@@ -159,17 +320,79 @@ const AccountPage = () => {
     typeof profileMeta.phone === "string" ? profileMeta.phone : "";
   const resolvedEmail = currentUser?.email || metaEmail;
   const resolvedPhone = phoneNumber || metaPhone;
+  const planTierRaw =
+    latestSubscription?.plan_tier ?? entitlementProfile?.plan_tier ?? "free";
+  const planTier = String(planTierRaw || "free").toLowerCase();
+  const planLabel = planLabelMap[planTier] ?? String(planTierRaw || "免费版");
+  const showBillingInfo = planTier === "pro";
+  const statusRaw =
+    latestSubscription?.status ?? entitlementProfile?.subscription_status ?? "";
+  const statusLabel =
+    planStatusMap[String(statusRaw || "").toLowerCase()] ||
+    (statusRaw ? String(statusRaw) : "未开通");
+  const expiresAt = formatDate(
+    latestSubscription?.end_at ?? entitlementProfile?.subscription_end_at
+  );
+  const cycle = resolveCycle(
+    latestSubscription?.start_at ?? entitlementProfile?.subscription_start_at,
+    latestSubscription?.end_at ?? entitlementProfile?.subscription_end_at
+  );
+  const autoRenew = parseBoolean(
+    latestSubscription?.auto_renew ?? entitlementProfile?.auto_renew
+  );
+  const fallbackUsage = planUsageMap[planTier] ?? planUsageMap.free;
+  const catalogPointsLimit = parseNumber(planCatalog?.points_limit);
+  const catalogChatLimit = parseNumber(planCatalog?.chat_limit);
+  const catalogProLimit = parseNumber(planCatalog?.pro_limit);
+  const pointsQuota = parseNumber(latestSubscription?.points_quota);
+  const chatQuota = parseNumber(latestSubscription?.chat_quota);
+  const proQuota = parseNumber(latestSubscription?.pro_quota);
+  const pointsLimit =
+    pointsQuota > 0
+      ? pointsQuota
+      : catalogPointsLimit > 0
+        ? catalogPointsLimit
+        : fallbackUsage.pointsLimit;
+  const chatLimit =
+    chatQuota > 0
+      ? chatQuota
+      : catalogChatLimit > 0
+        ? catalogChatLimit
+        : fallbackUsage.chatLimit;
+  const proLimit =
+    proQuota > 0
+      ? proQuota
+      : catalogProLimit > 0
+        ? catalogProLimit
+        : fallbackUsage.proLimit;
+  const pointsBalance = parseNumber(entitlementProfile?.points_balance);
+  const pointsRemaining = Math.max(0, Math.min(pointsBalance, pointsLimit));
+  const chatUsed = parseNumber(entitlementProfile?.chat_count_total);
+  const proUsedRaw = parseNumber(entitlementProfile?.pro_model_calls_total);
+  const isFreeTier = planTier === "free" || planTier === "trial";
+  let proLimitDisplay = proLimit;
+  let proUsedDisplay = proUsedRaw;
+
+  if (isFreeTier && proLimit <= 0) {
+    proLimitDisplay = -1;
+    proUsedDisplay = 0;
+  } else if (!isFreeTier && proLimit <= 0) {
+    proLimitDisplay = 0;
+    proUsedDisplay = proUsedRaw;
+  }
   const entitlementPlan = {
-    tier: "Pro",
-    status: "试用中",
-    expiresAt: "2025-06-30",
-    cycle: "月付",
-    autoRenew: true,
+    tier: planLabel,
+    status: isLoading ? "加载中" : statusLabel,
+    expiresAt: isLoading ? "--" : expiresAt,
+    cycle,
+    autoRenew,
   };
+  const pointsUsedDisplay = currentUser ? pointsRemaining : 0;
+  const pointsLimitDisplay = currentUser ? pointsLimit : null;
   const usageItems = [
-    { label: "对话次数", used: 128, limit: 500, unit: "次" },
-    { label: "点数", used: 3600, limit: 10000, unit: "点" },
-    { label: "高级模型调用", used: 18, limit: 60, unit: "次" },
+    { label: "对话次数", used: chatUsed, limit: chatLimit, unit: "次" },
+    { label: "点数", used: pointsUsedDisplay, limit: pointsLimitDisplay, unit: "点" },
+    { label: "高级模型调用", used: proUsedDisplay, limit: proLimitDisplay, unit: "次" },
   ];
 
   return (
@@ -278,6 +501,119 @@ const AccountPage = () => {
               </div>
             </div>
 
+            <div className="rounded-2xl border border-secondary/60 bg-card/80 p-6">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-secondary bg-muted/40">
+                  <Sparkles className="size-5 text-foreground" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold">权益管理</h2>
+                  <p className="text-sm text-muted-foreground">
+                    查看订阅与用量，并快速进入管理页。
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+                <div className="grid gap-4">
+                  <div className="rounded-xl border border-secondary/40 bg-muted/20 p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          AI 权益卡
+                        </p>
+                        <p className="text-lg font-semibold mt-2">
+                          {entitlementPlan.tier} · {entitlementPlan.status}
+                        </p>
+                        {showBillingInfo && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {entitlementPlan.cycle} ·{" "}
+                            {entitlementPlan.autoRenew
+                              ? "自动续费开启"
+                              : "自动续费关闭"}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <CalendarClock className="size-4" />
+                        到期 {entitlementPlan.expiresAt}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-secondary/40 bg-muted/10 p-5">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Gauge className="size-4" />
+                      本月用量摘要
+                    </div>
+                    <div className="mt-4 space-y-4">
+                      {usageItems.map((item) => {
+                        const limitValue = item.limit ?? 0;
+                        const hasLimit = item.limit !== null;
+                        const safeLimit = limitValue > 0 ? limitValue : 1;
+                        const percent =
+                          limitValue > 0
+                            ? Math.min(
+                                100,
+                                Math.round((item.used / safeLimit) * 100)
+                              )
+                            : 0;
+                        const limitText = hasLimit
+                          ? limitValue > 0
+                            ? `${limitValue}${item.unit}`
+                            : limitValue < 0
+                              ? "不可用"
+                              : "不限"
+                          : "";
+                        return (
+                          <div key={item.label}>
+                            <div className="flex items-center justify-between text-sm">
+                              <span>{item.label}</span>
+                              <span className="text-muted-foreground">
+                                {hasLimit ? `${item.used}/${limitText}` : item.used}
+                              </span>
+                            </div>
+                            <div className="mt-2 h-2 rounded-full bg-muted">
+                              <div
+                                className="h-2 rounded-full bg-primary"
+                                style={{ width: `${percent}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid gap-4">
+                  <div className="rounded-xl border border-secondary/40 bg-muted/20 p-5">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Wallet className="size-4" />
+                      快捷入口
+                    </div>
+                    <div className="mt-4 grid gap-3">
+                      <Button asChild>
+                        <Link href="/account/subscription">
+                          管理订阅
+                          <ArrowUpRight className="ml-2 size-4" />
+                        </Link>
+                      </Button>
+                      <Button asChild variant="secondary">
+                        <Link href="/account/wallet">
+                          钱包管理
+                          <ArrowUpRight className="ml-2 size-4" />
+                        </Link>
+                      </Button>
+                      <p className="text-xs text-muted-foreground">
+                        展示示例数据，后续可对接真实订阅与用量服务。
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div
               id="security"
               className="rounded-2xl border border-secondary/60 bg-card/80 p-6"
@@ -336,102 +672,6 @@ const AccountPage = () => {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-secondary/60 bg-card/80 p-6">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-secondary bg-muted/40">
-                  <Sparkles className="size-5 text-foreground" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold">权益管理</h2>
-                  <p className="text-sm text-muted-foreground">
-                    查看订阅与用量，并快速进入管理页。
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
-                <div className="grid gap-4">
-                  <div className="rounded-xl border border-secondary/40 bg-muted/20 p-5">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          AI 权益卡
-                        </p>
-                        <p className="text-lg font-semibold mt-2">
-                          {entitlementPlan.tier} · {entitlementPlan.status}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {entitlementPlan.cycle} ·{" "}
-                          {entitlementPlan.autoRenew ? "自动续费开启" : "自动续费关闭"}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <CalendarClock className="size-4" />
-                        到期 {entitlementPlan.expiresAt}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border border-secondary/40 bg-muted/10 p-5">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Gauge className="size-4" />
-                      本月用量摘要
-                    </div>
-                    <div className="mt-4 space-y-4">
-                      {usageItems.map((item) => {
-                        const percent = Math.min(
-                          100,
-                          Math.round((item.used / item.limit) * 100)
-                        );
-                        return (
-                          <div key={item.label}>
-                            <div className="flex items-center justify-between text-sm">
-                              <span>{item.label}</span>
-                              <span className="text-muted-foreground">
-                                {item.used}/{item.limit}
-                                {item.unit}
-                              </span>
-                            </div>
-                            <div className="mt-2 h-2 rounded-full bg-muted">
-                              <div
-                                className="h-2 rounded-full bg-primary"
-                                style={{ width: `${percent}%` }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid gap-4">
-                  <div className="rounded-xl border border-secondary/40 bg-muted/20 p-5">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Wallet className="size-4" />
-                      快捷入口
-                    </div>
-                    <div className="mt-4 grid gap-3">
-                      <Button asChild>
-                        <Link href="/account/subscription">
-                          管理订阅
-                          <ArrowUpRight className="ml-2 size-4" />
-                        </Link>
-                      </Button>
-                      <Button asChild variant="secondary">
-                        <Link href="/account/wallet">
-                          钱包管理
-                          <ArrowUpRight className="ml-2 size-4" />
-                        </Link>
-                      </Button>
-                      <p className="text-xs text-muted-foreground">
-                        展示示例数据，后续可对接真实订阅与用量服务。
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </section>
         </div>
       </div>

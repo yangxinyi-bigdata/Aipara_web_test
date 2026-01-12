@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getCloudbaseClient, type CloudbaseClient } from "@/lib/cloudbase";
+import { callProfileService } from "@/lib/profile-service";
 import {
   formatPhoneForDisplay,
   getUserPhone,
@@ -112,33 +113,19 @@ const PasswordPage = () => {
       ...extraMeta,
     };
 
-    const metaPayload = JSON.stringify(mergedMeta);
-
-    const { error } = await client.db
-      .from("user_profile")
-      .update({ meta: metaPayload })
-      .eq("uid", currentUser.uid)
-      .eq("owner", currentUser.uid);
-
-    if (error) {
-      const { error: upsertError } = await client.db
-        .from("user_profile")
-        .upsert(
-          {
-            owner: currentUser.uid,
-            uid: currentUser.uid,
-            meta: metaPayload,
-          },
-          { onConflict: "uid" }
-        );
-
-      if (upsertError) {
-        console.error("Failed to update user_profile meta", upsertError);
-        return;
-      }
+    try {
+      const result = await callProfileService(
+        "profile.updateMeta",
+        { meta: mergedMeta },
+        client
+      );
+      const nextMeta =
+        (result as { meta?: Record<string, unknown> } | null)?.meta ??
+        mergedMeta;
+      setProfileMeta(nextMeta);
+    } catch (error) {
+      console.error("Failed to update user_profile meta", error);
     }
-
-    setProfileMeta(mergedMeta);
   };
 
   React.useEffect(() => {
