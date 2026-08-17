@@ -1,0 +1,5 @@
+{
+  "enabledPlugins": {
+    "cloudbase@TencentCloudBase-cloudbase-plugin": true
+  }
+}

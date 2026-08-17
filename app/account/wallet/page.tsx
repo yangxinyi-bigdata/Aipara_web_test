@@ -12,8 +12,13 @@ import {
   Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getCloudbaseClient, type CloudbaseClient } from "@/lib/cloudbase";
+import {
+  getCloudbaseClient,
+  type AuthStateChangeEvent,
+  type CloudbaseClient,
+} from "@/lib/cloudbase";
 import { callProfileService } from "@/lib/profile-service";
+import { getUserUid } from "@/lib/user";
 
 type CurrentUser = Awaited<
   ReturnType<CloudbaseClient["auth"]["getCurrentUser"]>
@@ -111,19 +116,29 @@ const WalletPage = () => {
         return;
       }
 
+      const uid = getUserUid(user);
+      if (!uid) {
+        if (isMountedRef.current) {
+          setProfile(null);
+          setFlows([]);
+          setIsLoading(false);
+        }
+        return;
+      }
+
       const [profileResult, billingResult] = await Promise.all([
         db
           .from("user_profile")
           .select("balance_amount,balance_currency,subscription_end_at")
-          .eq("uid", user.uid)
-          .eq("owner", user.uid)
+          .eq("uid", uid)
+          .eq("owner", uid)
           .limit(1),
         db
           .from("user_billing_ledger")
           .select(
             "id,txn_type,amount,currency,status,order_id,provider,remark,created_at"
           )
-          .eq("uid", user.uid)
+          .eq("uid", uid)
           .order("created_at", { ascending: false })
           .limit(8),
       ]);
@@ -195,7 +210,7 @@ const WalletPage = () => {
 
     loadUser();
 
-    client.auth.onLoginStateChanged(async (params) => {
+    client.auth.onLoginStateChanged(async (params: AuthStateChangeEvent) => {
       const eventType = params?.data?.eventType;
       if (eventType === "sign_in") {
         const user = await client.auth.getCurrentUser();

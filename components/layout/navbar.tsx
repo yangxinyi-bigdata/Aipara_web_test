@@ -4,12 +4,10 @@ import React from "react";
 import {
   Sheet,
   SheetContent,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "../ui/sheet";
-import { Separator } from "../ui/separator";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -24,9 +22,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { ToggleTheme } from "./toogle-theme";
 import { cn } from "@/lib/utils";
-import { getCloudbaseClient, type CloudbaseClient } from "@/lib/cloudbase";
+import {
+  getCloudbaseClient,
+  type AuthStateChangeEvent,
+  type CloudbaseClient,
+} from "@/lib/cloudbase";
 import { callProfileService } from "@/lib/profile-service";
 import { getUserPhone, normalizePhoneForApi } from "@/lib/phone";
+import { getUserPicture, getUserUid } from "@/lib/user";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useRouter } from "next/navigation";
 
@@ -69,11 +72,11 @@ const routeList: RouteProps[] = [
 
 const featureList: FeatureProps[] = [
   {
-    title: "段落输入 · 一次输入一段",
+    title: "独创段落输入 · 一次输入一段",
     description: "无论中文，英文，标点符号，一刻不停一次输入完成。",
   },
   {
-    title: "AI识别拼音 · 省心输入效率超高",
+    title: "AI拼音助手 · 省心输入效率超高",
     description: "AI拼音转换，将一整个段落的拼音一次性转换成中文，准确率高，告别选词。",
   },
   {
@@ -91,7 +94,7 @@ const getDisplayName = (user: CurrentUser) => {
     phone ||
     user.name ||
     user.email ||
-    `用户${user.uid.slice(0, 6)}`
+    `用户${getUserUid(user).slice(0, 6) || "未命名"}`
   );
 };
 
@@ -103,7 +106,7 @@ const buildBaseMeta = (user: CurrentUser) => {
     email: user?.email || null,
     phone: phone || null,
     phone_e164: phoneE164 || null,
-    picture: user?.picture || null,
+    picture: getUserPicture(user) || null,
   };
 };
 
@@ -114,7 +117,7 @@ const buildProfilePayload = (user: CurrentUser) => {
 
   return {
     display_name: getDisplayName(user),
-    avatar_url: user.picture || "",
+    avatar_url: getUserPicture(user),
     email: user.email || null,
     phone: phone || null,
     meta: baseMeta,
@@ -141,7 +144,6 @@ export const Navbar = () => {
   );
   const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
   const userMenuDesktopRef = React.useRef<HTMLDivElement>(null);
-  const userMenuMobileRef = React.useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   const displayName = React.useMemo(
@@ -149,7 +151,7 @@ export const Navbar = () => {
     [currentUser]
   );
 
-  const avatarUrl = currentUser?.picture || "";
+  const avatarUrl = getUserPicture(currentUser);
 
   React.useEffect(() => {
     let isMounted = true;
@@ -190,7 +192,7 @@ export const Navbar = () => {
     };
 
     loadUser();
-    client.auth.onLoginStateChanged(async (params) => {
+    client.auth.onLoginStateChanged(async (params: AuthStateChangeEvent) => {
       const eventType = params?.data?.eventType;
 
       if (eventType === "sign_in") {
@@ -233,10 +235,7 @@ export const Navbar = () => {
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (
-        userMenuDesktopRef.current?.contains(target) ||
-        userMenuMobileRef.current?.contains(target)
-      ) {
+      if (userMenuDesktopRef.current?.contains(target)) {
         return;
       }
       setIsUserMenuOpen(false);
@@ -281,141 +280,20 @@ export const Navbar = () => {
   };
 
   return (
-    <header className="shadow-inner bg-opacity-15 w-[95%] md:w-[85%] lg:w-[85%] lg:max-w-screen-xl top-5 mx-auto sticky border border-secondary z-40 rounded-2xl flex justify-between items-center gap-4 p-2 bg-card">
+    <header className="shadow-inner bg-opacity-15 w-[95%] min-[1280px]:w-[85%] lg:max-w-screen-xl top-5 mx-auto sticky border border-secondary z-40 rounded-2xl grid grid-cols-[auto_minmax(0,1fr)_auto] min-[1050px]:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 p-2 bg-card">
       <Link
         href="/"
-        className="font-bold text-lg flex items-center gap-2 whitespace-nowrap flex-shrink-0"
+        className="font-bold text-base sm:text-lg flex items-center gap-2 whitespace-nowrap flex-shrink-0"
       >
-        <ChevronsDown className="bg-gradient-to-tr border-secondary from-primary via-primary/70 to-primary rounded-lg w-9 h-9 mr-2 border text-white shrink-0 aspect-square" />
+        <ChevronsDown className="bg-gradient-to-tr border-secondary from-primary via-primary/70 to-primary rounded-lg w-9 h-9 mr-1 sm:mr-2 border text-white shrink-0 aspect-square" />
         AI段落输入法
       </Link>
-      {/* <!-- Mobile --> */}
-      <div className="flex items-center lg:hidden">
-        <Sheet
-          open={isOpen}
-          onOpenChange={(open) => {
-            setIsOpen(open);
-            if (!open) {
-              setIsUserMenuOpen(false);
-            }
-          }}
-        >
-          <SheetTrigger asChild>
-            <Menu
-              onClick={() => setIsOpen(!isOpen)}
-              className="cursor-pointer lg:hidden"
-            />
-          </SheetTrigger>
-
-          <SheetContent
-            side="left"
-            className="flex flex-col justify-between rounded-tr-2xl rounded-br-2xl bg-card border-secondary"
-          >
-            <div>
-              <SheetHeader className="mb-4 ml-4">
-                <SheetTitle className="flex items-center">
-                  <Link href="/" className="flex items-center">
-                    <ChevronsDown className="bg-gradient-to-tr border-secondary from-primary via-primary/70 to-primary rounded-lg w-9 h-9 mr-2 border text-white" />
-                    Aipara 输入法
-                  </Link>
-                </SheetTitle>
-              </SheetHeader>
-
-              <div className="flex flex-col gap-2">
-                {routeList.map(({ href, label }) => (
-                  <Button
-                    key={href}
-                    onClick={() => setIsOpen(false)}
-                    asChild
-                    variant="ghost"
-                    className="justify-start text-base"
-                  >
-                    <Link href={href}>{label}</Link>
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <SheetFooter className="flex-col sm:flex-col justify-start items-start">
-              <Separator className="mb-2" />
-
-              <ToggleTheme />
-              {currentUser ? (
-                <div className="mt-3 flex w-full items-center gap-3 rounded-lg border border-secondary bg-card/40 px-3 py-2">
-                  <Avatar className="h-9 w-9">
-                    <AvatarImage src={avatarUrl} alt={displayName || "用户"} />
-                    <AvatarFallback>
-                      {(displayName || "U").slice(0, 1).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{displayName}</p>
-                    <p className="text-xs text-muted-foreground">
-                      已登录
-                    </p>
-                  </div>
-                  <div ref={userMenuMobileRef} className="relative">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="px-2"
-                      aria-haspopup="menu"
-                      aria-expanded={isUserMenuOpen}
-                      onClick={() => setIsUserMenuOpen((prev) => !prev)}
-                    >
-                      <Settings className="size-4" />
-                    </Button>
-                    {isUserMenuOpen && (
-                      <div className="absolute right-0 top-full z-50 w-40">
-                        <div className="h-2" />
-                        <div
-                          role="menu"
-                          className="rounded-lg border border-secondary/70 bg-card shadow-lg"
-                        >
-                          <Button
-                            asChild
-                            variant="ghost"
-                            className="w-full justify-start"
-                            onClick={() => {
-                              setIsOpen(false);
-                              setIsUserMenuOpen(false);
-                            }}
-                          >
-                            <Link href="/account">账号设置</Link>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start"
-                            onClick={handleLogout}
-                          >
-                            退出
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <Button
-                  size="sm"
-                  className="mt-3"
-                  onClick={handleLogin}
-                  aria-label="登录/注册"
-                >
-                  <LogIn className="mr-2 size-4" />
-                  登录/注册
-                </Button>
-              )}
-            </SheetFooter>
-          </SheetContent>
-        </Sheet>
-      </div>
 
       {/* <!-- Desktop --> */}
-      <NavigationMenu className="hidden lg:flex flex-1 min-w-0 justify-center ml-0">
+      <NavigationMenu className="hidden min-[1050px]:flex min-w-0 justify-self-center justify-center ml-0">
         <NavigationMenuList className="justify-center gap-0 whitespace-nowrap">
           <NavigationMenuItem>
-            <NavigationMenuTrigger className="text-base px-2">
+            <NavigationMenuTrigger className="text-base px-1.5">
               功能亮点
             </NavigationMenuTrigger>
             <NavigationMenuContent>
@@ -450,7 +328,7 @@ export const Navbar = () => {
             <NavigationMenuItem key={href}>
               <NavigationMenuLink
                 asChild
-                className={cn(navigationMenuTriggerStyle(), "text-base px-2")}
+                className={cn(navigationMenuTriggerStyle(), "text-base px-1.5")}
               >
                 <Link href={href}>{label}</Link>
               </NavigationMenuLink>
@@ -459,10 +337,16 @@ export const Navbar = () => {
         </NavigationMenuList>
       </NavigationMenu>
 
-      <div className="hidden lg:flex flex-shrink-0 items-center gap-6 ml-0">
+      <div className="flex flex-shrink-0 items-center justify-self-end gap-1 sm:gap-2">
         <div className="flex items-center gap-1">
-          <ToggleTheme />
-          <Button asChild size="sm" variant="ghost" aria-label="立即下载">
+          <ToggleTheme compact />
+          <Button
+            asChild
+            size="sm"
+            variant="ghost"
+            aria-label="立即下载"
+            className="h-9 w-9 p-0"
+          >
             <Link aria-label="立即下载" href="#download" target="_self">
               <Download className="size-5" />
             </Link>
@@ -525,10 +409,58 @@ export const Navbar = () => {
           </div>
         ) : (
           <Button size="sm" variant="secondary" onClick={handleLogin}>
-            <LogIn className="mr-2 size-4" />
-            登录/注册
+            <LogIn className="sm:mr-2 size-4" />
+            <span className="hidden sm:inline">登录/注册</span>
           </Button>
         )}
+        <Sheet
+          open={isOpen}
+          onOpenChange={(open) => {
+            setIsOpen(open);
+            if (!open) {
+              setIsUserMenuOpen(false);
+            }
+          }}
+        >
+          <SheetTrigger asChild>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-9 w-9 p-0 min-[1050px]:hidden"
+              aria-label="打开导航菜单"
+            >
+              <Menu className="size-5" />
+            </Button>
+          </SheetTrigger>
+
+          <SheetContent
+            side="left"
+            className="flex flex-col rounded-tr-2xl rounded-br-2xl bg-card border-secondary"
+          >
+            <SheetHeader className="mb-4 ml-4">
+              <SheetTitle className="flex items-center">
+                <Link href="/" className="flex items-center">
+                  <ChevronsDown className="bg-gradient-to-tr border-secondary from-primary via-primary/70 to-primary rounded-lg w-9 h-9 mr-2 border text-white" />
+                  段落输入法
+                </Link>
+              </SheetTitle>
+            </SheetHeader>
+
+            <div className="flex flex-col gap-2">
+              {routeList.map(({ href, label }) => (
+                <Button
+                  key={href}
+                  onClick={() => setIsOpen(false)}
+                  asChild
+                  variant="ghost"
+                  className="justify-start text-base"
+                >
+                  <Link href={href}>{label}</Link>
+                </Button>
+              ))}
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
     </header>
   );

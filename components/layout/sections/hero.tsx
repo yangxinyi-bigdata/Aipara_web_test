@@ -5,8 +5,12 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 export const HeroSection = () => {
   const { theme } = useTheme();
+  const dashboardImage = `${basePath}/输入法设置页面2.png`;
+
   return (
     <section className="container w-full">
       <div className="grid place-items-center lg:max-w-screen-xl gap-8 mx-auto py-20 md:py-32">
@@ -53,8 +57,8 @@ export const HeroSection = () => {
             className="w-full md:w-[1200px] mx-auto rounded-lg relative rouded-lg leading-none flex items-center border border-t-2 border-secondary  border-t-primary/30"
             src={
               theme === "light"
-                ? "/输入法设置页面2.png"
-                : "/输入法设置页面2.png"
+                ? dashboardImage
+                : dashboardImage
             }
             alt="dashboard"
           />

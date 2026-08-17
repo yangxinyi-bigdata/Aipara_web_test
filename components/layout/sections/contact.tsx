@@ -52,7 +52,7 @@ export const ContactSection = () => {
     const { firstName, lastName, email, subject, message } = values;
     console.log(values);
 
-    const mailToLink = `mailto:team@aipara.app?subject=${encodeURIComponent(
+    const mailToLink = `mailto:yangxinyigo@icloud.com?subject=${encodeURIComponent(
       subject
     )}&body=${encodeURIComponent(
       `您好，我是${firstName}${lastName}，联系邮箱 ${email}。\n${message}`
@@ -70,7 +70,7 @@ export const ContactSection = () => {
               联系我们
             </h2>
 
-            <h2 className="text-3xl md:text-4xl font-bold">聊聊 Aipara</h2>
+            <h2 className="text-3xl md:text-4xl font-bold">聊聊段落输入法</h2>
           </div>
           <p className="mb-8 text-muted-foreground lg:w-5/6">
             技术咨询、内测、词库定制、高级功能开发？留下信息，我们会尽快联系你。
@@ -83,7 +83,7 @@ export const ContactSection = () => {
                 <div className="font-bold">我们在</div>
               </div>
 
-              <div>线上团队</div>
+              <div>长沙段落科技有限公司</div>
             </div>
 
             <div>

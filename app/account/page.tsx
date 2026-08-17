@@ -17,8 +17,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getCloudbaseClient, type CloudbaseClient } from "@/lib/cloudbase";
+import {
+  getCloudbaseClient,
+  type AuthStateChangeEvent,
+  type CloudbaseClient,
+} from "@/lib/cloudbase";
 import { getUserPhone } from "@/lib/phone";
+import { getUserPicture, getUserUid } from "@/lib/user";
 
 type CurrentUser = Awaited<
   ReturnType<CloudbaseClient["auth"]["getCurrentUser"]>
@@ -64,7 +69,7 @@ const getDisplayName = (user: CurrentUser) => {
     phone ||
     user.name ||
     user.email ||
-    `用户${user.uid.slice(0, 6)}`
+    `用户${getUserUid(user).slice(0, 6) || "未命名"}`
   );
 };
 
@@ -182,21 +187,32 @@ const AccountPage = () => {
         return;
       }
 
+      const uid = getUserUid(user);
+      if (!uid) {
+        if (isMounted) {
+          setProfileMeta({});
+          setEntitlementProfile(null);
+          setLatestSubscription(null);
+          setIsLoading(false);
+        }
+        return;
+      }
+
       const [profileResult, subscriptionResult] = await Promise.all([
         db
           .from("user_profile")
           .select(
             "meta,plan_tier,subscription_status,subscription_start_at,subscription_end_at,auto_renew,points_balance,points_reset_at,chat_count_total,pro_model_calls_total"
           )
-          .eq("uid", user.uid)
-          .eq("owner", user.uid)
+          .eq("uid", uid)
+          .eq("owner", uid)
           .limit(1),
         db
           .from("user_subscription")
           .select(
             "plan_tier,status,start_at,end_at,auto_renew,points_quota,chat_quota,pro_quota"
           )
-          .eq("uid", user.uid)
+          .eq("uid", uid)
           .order("start_at", { ascending: false })
           .limit(1),
       ]);
@@ -263,7 +279,7 @@ const AccountPage = () => {
 
     loadUser();
 
-    client.auth.onLoginStateChanged(async (params) => {
+    client.auth.onLoginStateChanged(async (params: AuthStateChangeEvent) => {
       const eventType = params?.data?.eventType;
       if (eventType === "sign_in") {
         try {
@@ -305,7 +321,7 @@ const AccountPage = () => {
   };
 
   const displayName = getDisplayName(currentUser);
-  const avatarUrl = currentUser?.picture || "";
+  const avatarUrl = getUserPicture(currentUser);
   const phoneNumber = getUserPhone(currentUser);
   const passwordSet = profileMeta["password_set"] === true;
   const passwordSkipped = profileMeta["password_skipped"] === true;
@@ -334,8 +350,8 @@ const AccountPage = () => {
     latestSubscription?.end_at ?? entitlementProfile?.subscription_end_at
   );
   const cycle = resolveCycle(
-    latestSubscription?.start_at ?? entitlementProfile?.subscription_start_at,
-    latestSubscription?.end_at ?? entitlementProfile?.subscription_end_at
+    latestSubscription?.start_at ?? entitlementProfile?.subscription_start_at ?? null,
+    latestSubscription?.end_at ?? entitlementProfile?.subscription_end_at ?? null
   );
   const autoRenew = parseBoolean(
     latestSubscription?.auto_renew ?? entitlementProfile?.auto_renew

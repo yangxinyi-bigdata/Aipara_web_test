@@ -7,13 +7,18 @@ import { KeyRound, LogIn, Mail, Phone, ShieldCheck, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getCloudbaseClient, type CloudbaseClient } from "@/lib/cloudbase";
+import {
+  getCloudbaseClient,
+  type AuthStateChangeEvent,
+  type CloudbaseClient,
+} from "@/lib/cloudbase";
 import { callProfileService } from "@/lib/profile-service";
 import {
   formatPhoneForDisplay,
   getUserPhone,
   normalizePhoneForApi,
 } from "@/lib/phone";
+import { getUserPicture, getUserUid } from "@/lib/user";
 
 type CurrentUser = Awaited<
   ReturnType<CloudbaseClient["auth"]["getCurrentUser"]>
@@ -50,7 +55,7 @@ const buildBaseMeta = (user: CurrentUser) => {
     email: user?.email || null,
     phone: phone || null,
     phone_e164: phoneE164 || null,
-    picture: user?.picture || null,
+    picture: getUserPicture(user) || null,
   };
 };
 
@@ -88,11 +93,14 @@ const PasswordPage = () => {
       return;
     }
 
+    const uid = getUserUid(user);
+    if (!uid) return;
+
     const { data, error } = await client.db
       .from("user_profile")
       .select("meta")
-      .eq("uid", user.uid)
-      .eq("owner", user.uid)
+      .eq("uid", uid)
+      .eq("owner", uid)
       .limit(1);
 
     if (error) {
@@ -163,7 +171,7 @@ const PasswordPage = () => {
 
     loadUser();
 
-    client.auth.onLoginStateChanged(async (params) => {
+    client.auth.onLoginStateChanged(async (params: AuthStateChangeEvent) => {
       const eventType = params?.data?.eventType;
       if (eventType === "sign_in") {
         try {
@@ -355,7 +363,7 @@ const PasswordPage = () => {
   const passwordSet = profileMeta["password_set"] === true;
   const hasEmail = Boolean(email);
   const hasPhone = Boolean(phone);
-  const isPhoneLocked = Boolean(currentUser?.phone || getUserPhone(currentUser));
+  const isPhoneLocked = Boolean(getUserPhone(currentUser));
 
   return (
     <main className="min-h-screen bg-background">

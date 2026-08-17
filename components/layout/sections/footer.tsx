@@ -11,7 +11,7 @@ export const FooterSection = () => {
             <Link href="#" className="flex font-bold items-center">
               <ChevronsDownIcon className="w-9 h-9 mr-2 bg-gradient-to-tr from-primary via-primary/70 to-primary rounded-lg border border-secondary" />
 
-              <h3 className="text-2xl">Aipara 输入法</h3>
+              <h3 className="text-2xl">段落输入法</h3>
             </Link>
           </div>
 
@@ -77,10 +77,21 @@ export const FooterSection = () => {
         </div>
 
         <Separator className="my-6" />
-        <section className="">
-          <h3 className="">
-            &copy; 2025 Aipara 输入法 · 与 AI 深度集成
+        <section className="flex flex-col gap-2 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
+          <h3 className="text-foreground">
+            &copy; 2025 段落输入法 · 与 AI 深度集成
           </h3>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 md:justify-end">
+            <span>长沙段落科技有限公司</span>
+            <a
+              href="https://beian.miit.gov.cn/"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-foreground hover:underline"
+            >
+              湘ICP备2026016017号-1
+            </a>
+          </div>
         </section>
       </div>
     </footer>

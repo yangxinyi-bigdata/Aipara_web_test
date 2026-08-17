@@ -14,8 +14,13 @@ import {
   User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getCloudbaseClient, type CloudbaseClient } from "@/lib/cloudbase";
+import {
+  getCloudbaseClient,
+  type AuthStateChangeEvent,
+  type CloudbaseClient,
+} from "@/lib/cloudbase";
 import { callProfileService } from "@/lib/profile-service";
+import { getUserUid } from "@/lib/user";
 
 type CurrentUser = Awaited<
   ReturnType<CloudbaseClient["auth"]["getCurrentUser"]>
@@ -243,21 +248,32 @@ const SubscriptionPage = () => {
         return;
       }
 
+      const uid = getUserUid(user);
+      if (!uid) {
+        if (isMountedRef.current) {
+          setProfile(null);
+          setLatestSubscription(null);
+          setPlanCatalogMap(catalogMap);
+          setIsLoading(false);
+        }
+        return;
+      }
+
       const [profileResult, subscriptionResult] = await Promise.all([
         db
           .from("user_profile")
           .select(
             "plan_tier,subscription_status,subscription_start_at,subscription_end_at,auto_renew,points_balance,balance_amount,points_reset_at,chat_count_total,pro_model_calls_total"
           )
-          .eq("uid", user.uid)
-          .eq("owner", user.uid)
+          .eq("uid", uid)
+          .eq("owner", uid)
           .limit(1),
         db
           .from("user_subscription")
           .select(
             "id,plan_tier,status,start_at,end_at,auto_renew,points_quota,chat_quota,pro_quota,price_amount,currency,order_id"
           )
-          .eq("uid", user.uid)
+          .eq("uid", uid)
           .order("start_at", { ascending: false })
           .limit(1),
       ]);
@@ -325,7 +341,7 @@ const SubscriptionPage = () => {
 
     loadUser();
 
-    client.auth.onLoginStateChanged(async (params) => {
+    client.auth.onLoginStateChanged(async (params: AuthStateChangeEvent) => {
       const eventType = params?.data?.eventType;
       if (eventType === "sign_in") {
         const user = await client.auth.getCurrentUser();
@@ -769,7 +785,7 @@ const SubscriptionPage = () => {
                 checked={renewFailDontShow}
                 onChange={(event) => setRenewFailDontShow(event.target.checked)}
               />
-              不再提示（Don't show this again）
+              不再提示（Don&apos;t show this again）
             </label>
             <div className="mt-4 flex justify-end">
               <Button onClick={closeRenewFailDialog}>知道了</Button>

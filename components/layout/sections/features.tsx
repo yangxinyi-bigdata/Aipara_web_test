@@ -13,7 +13,7 @@ const featureList: FeaturesProps[] = [
     icon: "ScrollText",
     title: "段落输入",
     description:
-      "AI段落输入法的终极目标是消灭选词，一次性输入一整个段落，段落中不只是中文，可以包含英文和标点符号等任意内容。",
+      "段落输入法的终极目标是消灭选词，一次性输入一整个段落，段落中不只是中文，可以包含英文和标点符号等任意内容。",
   },
   {
     icon: "Languages",

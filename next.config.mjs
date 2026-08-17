@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const isProd = process.env.NODE_ENV === "production";
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 const nextConfig = {
   ...(isProd ? { output: "export" } : {}),
+  ...(basePath ? { basePath, assetPrefix: basePath } : {}),
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -25,7 +27,7 @@ const nextConfig = {
       {
         source: "/__auth/:path*",
         destination:
-          "https://aipara.yangxinyi.site/__auth/:path*",
+          "https://duanluo.chat/__auth/:path*",
       },
     ];
   },

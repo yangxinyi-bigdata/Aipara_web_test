@@ -6,6 +6,10 @@ html {
   scroll-behavior: smooth;
 }
 
+body {
+  font-family: Sora, "Noto Sans SC", Arial, sans-serif;
+}
+
 /* *=========== Default theme =========== */
 /* @layer base {
   :root {

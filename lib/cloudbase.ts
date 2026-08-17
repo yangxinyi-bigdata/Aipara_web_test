@@ -1,10 +1,41 @@
 import cloudbase from "@cloudbase/js-sdk";
 
 type CloudbaseApp = ReturnType<typeof cloudbase.init>;
+type CloudbaseAuth = ReturnType<CloudbaseApp["auth"]>;
+
+type VerificationInfo = {
+  verification_id: string;
+  is_user: boolean;
+};
+
+type VerificationLoginResult = {
+  error?: {
+    error_description?: string;
+  };
+};
+
+type CloudbaseAuthWithVerificationLogin = CloudbaseAuth & {
+  signInWithEmail(params: {
+    verificationInfo: VerificationInfo;
+    verificationCode: string;
+    email: string;
+  }): Promise<VerificationLoginResult>;
+  signInWithSms(params: {
+    verificationInfo: VerificationInfo;
+    verificationCode: string;
+    phoneNum: string;
+  }): Promise<VerificationLoginResult>;
+};
+
+export type AuthStateChangeEvent = {
+  data?: {
+    eventType?: string;
+  };
+};
 
 export type CloudbaseClient = {
   app: CloudbaseApp;
-  auth: ReturnType<CloudbaseApp["auth"]>;
+  auth: CloudbaseAuthWithVerificationLogin;
   db: ReturnType<CloudbaseApp["rdb"]>;
 };
 
@@ -19,7 +50,7 @@ export const getCloudbaseClient = () => {
 
     client = {
       app,
-      auth: app.auth(),
+      auth: app.auth() as unknown as CloudbaseAuthWithVerificationLogin,
       db: app.rdb(),
     };
   }

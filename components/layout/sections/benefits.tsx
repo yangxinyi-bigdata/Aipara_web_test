@@ -46,10 +46,10 @@ export const BenefitsSection = () => {
           </h2>
 
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Aipara 目标是使用AI技术消灭选词
+            段落输入法目标是使用AI技术消灭选词
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            创造新的"段落输入"范式，使用AI技术一次性从拼音转换到正确的中文，甚至可以顺便完成语言润色。
+            创造新的&quot;段落输入&quot;范式，使用AI技术一次性从拼音转换到正确的中文，甚至可以顺便完成语言润色。
           </p>
         </div>
 

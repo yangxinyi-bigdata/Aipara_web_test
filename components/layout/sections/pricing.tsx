@@ -56,7 +56,7 @@ export const PricingSection = () => {
   return (
     <section id="download" className="container py-24 sm:py-32">
       <h2 className="text-lg text-primary text-center mb-2 tracking-wider">
-        下载 Aipara 输入法
+        下载 段落输入法
       </h2>
 
       <h2 className="text-3xl md:text-4xl text-center font-bold mb-4">

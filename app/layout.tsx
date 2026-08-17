@@ -1,18 +1,12 @@
 import type { Metadata } from "next";
-import { Sora } from "next/font/google";
 import "./globals.css";
-import { cn } from "@/lib/utils";
 import { NavbarShell } from "@/components/layout/navbar-shell";
 import { ThemeProvider } from "@/components/layout/theme-provider";
-const sora = Sora({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  fallback: ["Noto Sans SC", "sans-serif"],
-});
 
 export const metadata: Metadata = {
-  title: "Shadcn - Landing template",
-  description: "Landing template from Shadcn",
+  title: "段落输入法 · Duanluo AI输入法",
+  description:
+    "段落输入法是基于AI时代的新需求构建的中文输入法，段落输入法的目标是消灭选词,一次性完成整段数输入。",
 };
 
 export default function RootLayout({
@@ -21,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-br" suppressHydrationWarning>
-      <body className={cn("min-h-screen bg-background", sora.className)}>
+    <html lang="zh-CN" suppressHydrationWarning>
+      <body className="min-h-screen bg-background">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

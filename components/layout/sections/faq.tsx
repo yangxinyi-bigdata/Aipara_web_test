@@ -13,7 +13,7 @@ interface FAQProps {
 
 const FAQList: FAQProps[] = [
   {
-    question: "Aipara 支持哪些平台？",
+    question: "段落输入法支持哪些平台？",
     answer: "当前聚焦桌面端 Windows / macOS ；未来将会支持安卓和iPhone/iPad等移动端。",
     value: "item-1",
   },

@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronsDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { getCloudbaseClient } from "@/lib/cloudbase";
 import { formatPhoneForDisplay, normalizePhoneForApi } from "@/lib/phone";
+import { getUserUid } from "@/lib/user";
 
 type LoginMode = "password" | "code";
 type IdentifierType = "phone" | "email" | "invalid";
@@ -34,6 +34,16 @@ type VerificationContext = {
 
 const parseIsUser = (value: unknown) =>
   value === true || value === 1 || value === "1";
+
+const getAuthError = (result: unknown) => {
+  if (typeof result !== "object" || result === null || !("error" in result)) {
+    return null;
+  }
+  const error = result.error;
+  return typeof error === "object" && error !== null
+    ? (error as { error_description?: string })
+    : null;
+};
 
 const parseMeta = (meta: unknown) => {
   if (!meta) return {};
@@ -82,7 +92,7 @@ const sanitizeRedirect = (target: string | null) => {
   return decoded;
 };
 
-const LoginPage = () => {
+const LoginContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTarget = sanitizeRedirect(searchParams.get("redirect"));
@@ -136,12 +146,14 @@ const LoginPage = () => {
   ) => {
     if (!client || !user) return redirectTarget;
     if (isNewUser) return "/account/password";
+    const uid = getUserUid(user);
+    if (!uid) return redirectTarget;
     try {
       const { data } = await client.db
         .from("user_profile")
         .select("meta")
-        .eq("uid", user.uid)
-        .eq("owner", user.uid)
+        .eq("uid", uid)
+        .eq("owner", uid)
         .limit(1);
       const meta = parseMeta(data?.[0]?.meta);
       const passwordSet = meta["password_set"] === true;
@@ -187,8 +199,9 @@ const LoginPage = () => {
         username: identifierInfo.normalized,
         password,
       });
-      if (result?.error) {
-        throw result.error;
+      const authError = getAuthError(result);
+      if (authError) {
+        throw authError;
       }
       const user = await ensureSignedIn(client);
       const nextPath = await resolvePostLoginRedirect(client, user, false);
@@ -271,8 +284,9 @@ const LoginPage = () => {
           signUpPayload.phone_number = verificationContext.normalized;
         }
         const result = await client.auth.signUp(signUpPayload);
-        if (result?.error) {
-          throw result.error;
+        const authError = getAuthError(result);
+        if (authError) {
+          throw authError;
         }
         isNewUser = true;
       };
@@ -283,12 +297,13 @@ const LoginPage = () => {
           verificationCode,
           email: verificationContext.normalized,
         });
-        if (result?.error) {
-          const description = result.error?.error_description || "";
+        const authError = getAuthError(result);
+        if (authError) {
+          const description = authError.error_description || "";
           if (description.includes("User not exist")) {
             await signUpWithVerification();
           } else {
-            throw result.error;
+            throw authError;
           }
         }
       } else {
@@ -298,12 +313,13 @@ const LoginPage = () => {
           verificationCode,
           phoneNum,
         });
-        if (result?.error) {
-          const description = result.error?.error_description || "";
+        const authError = getAuthError(result);
+        if (authError) {
+          const description = authError.error_description || "";
           if (description.includes("User not exist")) {
             await signUpWithVerification();
           } else {
-            throw result.error;
+            throw authError;
           }
         }
       }
@@ -342,7 +358,7 @@ const LoginPage = () => {
                 <ChevronsDown className="h-6 w-6" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Aipara 登录中心</p>
+                <p className="text-sm text-muted-foreground">段落输入法登录中心</p>
                 <h1 className="text-2xl font-semibold text-foreground">
                   登录 / 注册
                 </h1>
@@ -357,9 +373,9 @@ const LoginPage = () => {
           <section className="rounded-3xl border border-secondary/70 bg-card/90 p-6 shadow-sm backdrop-blur">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-foreground">账号登录</h2>
-              <Link className="text-sm text-primary" href="/">
-                返回首页
-              </Link>
+              <span className="text-sm text-muted-foreground">
+                登录后进入账户中心
+              </span>
             </div>
 
             <div className="mt-5 flex rounded-full border border-secondary bg-secondary/40 p-1">
@@ -461,5 +477,11 @@ const LoginPage = () => {
     </main>
   );
 };
+
+const LoginPage = () => (
+  <React.Suspense fallback={<main className="min-h-screen bg-background" />}>
+    <LoginContent />
+  </React.Suspense>
+);
 
 export default LoginPage;

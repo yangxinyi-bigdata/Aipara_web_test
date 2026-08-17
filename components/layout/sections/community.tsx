@@ -21,7 +21,7 @@ export const CommunitySection = () => {
                 <div>
                   加入
                   <span className="text-transparent pl-2 bg-gradient-to-r from-[#0FB5FF] to-primary bg-clip-text">
-                    Aipara 社区
+                    段落输入法社区
                   </span>
                 </div>
               </CardTitle>
