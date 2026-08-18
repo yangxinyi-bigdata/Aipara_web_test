@@ -24,55 +24,55 @@ interface ReviewProps {
   rating: number;
 }
 
+/**
+ * 占位内容：等收集到真实用户反馈后替换。
+ *
+ * - `image` 留空时会自动回落到头像首字（AvatarFallback），不加载任何外部图片。
+ *   填上真实头像路径（建议放 public/ 下）即可显示。
+ * - `rating` 目前不参与渲染，星级是组件里写死的五颗星。
+ */
 const reviewList: ReviewProps[] = [
   {
-    image: "https://github.com/shadcn.png",
-    name: "林晨",
-    userName: "技术写作者",
-    comment:
-      "长文档一口气打完再上屏，光标搜索+标点跳转很顶，用 AI 候选校对错误也快多了。",
+    image: "",
+    name: "用户名占位 01",
+    userName: "用户身份占位",
+    comment: "真实用户反馈占位。收集到内测反馈后替换这段文字。",
     rating: 5.0,
   },
   {
-    image: "https://github.com/shadcn.png",
-    name: "陈意",
-    userName: "独立开发者",
-    comment:
-      "代码解释直接粘贴到预编辑框问 AI，不用切应用，差异高亮帮助我快速挑对候选。",
-    rating: 4.8,
-  },
-
-  {
-    image: "https://github.com/shadcn.png",
-    name: "赵清",
-    userName: "产品经理",
-    comment:
-      "反引号混输英文再切回中文，逻辑写作顺畅；未上屏缓存救过我好几次。",
-    rating: 4.9,
-  },
-  {
-    image: "https://github.com/shadcn.png",
-    name: "周理",
-    userName: "数据科学家",
-    comment:
-      "多模型并行转写对专业名词识别更准，长段翻译效果比普通输入法好很多。",
+    image: "",
+    name: "用户名占位 02",
+    userName: "用户身份占位",
+    comment: "真实用户反馈占位。收集到内测反馈后替换这段文字。",
     rating: 5.0,
   },
   {
-    image: "https://github.com/shadcn.png",
-    name: "郁然",
-    userName: "翻译工作者",
-    comment:
-      "候选滚动+差异高亮让我在长句里挑选最自然的译文，效率提升明显。",
+    image: "",
+    name: "用户名占位 03",
+    userName: "用户身份占位",
+    comment: "真实用户反馈占位。收集到内测反馈后替换这段文字。",
     rating: 5.0,
   },
   {
-    image: "https://github.com/shadcn.png",
-    name: "唐崇",
-    userName: "运维工程师",
-    comment:
-      "命令行场景用中英混输很顺手，AI 纠错帮我减少低级拼写错误。",
-    rating: 4.9,
+    image: "",
+    name: "用户名占位 04",
+    userName: "用户身份占位",
+    comment: "真实用户反馈占位。收集到内测反馈后替换这段文字。",
+    rating: 5.0,
+  },
+  {
+    image: "",
+    name: "用户名占位 05",
+    userName: "用户身份占位",
+    comment: "真实用户反馈占位。收集到内测反馈后替换这段文字。",
+    rating: 5.0,
+  },
+  {
+    image: "",
+    name: "用户名占位 06",
+    userName: "用户身份占位",
+    comment: "真实用户反馈占位。收集到内测反馈后替换这段文字。",
+    rating: 5.0,
   },
 ];
 
@@ -116,11 +116,8 @@ export const TestimonialSection = () => {
                 <CardHeader>
                   <div className="flex flex-row items-center gap-4">
                     <Avatar>
-                      <AvatarImage
-                        src="https://avatars.githubusercontent.com/u/75042455?v=4"
-                        alt="radix"
-                      />
-                      <AvatarFallback>SV</AvatarFallback>
+                      <AvatarImage src={review.image} alt={review.name} />
+                      <AvatarFallback>{review.name.slice(0, 1)}</AvatarFallback>
                     </Avatar>
 
                     <div className="flex flex-col">

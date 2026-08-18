@@ -11,28 +11,27 @@ interface BenefitsProps {
 const benefitList: BenefitsProps[] = [
   {
     icon: "AlignVerticalJustifyCenter",
-    title: "整段内容一次性输入",
+    title: "不用再一句一顿",
     description:
-      "拼音与标点符号，英文共存，一次输入整段，一次识别整段，减少选词时间。",
+      "传统输入法每打几个字就要停下来选词，思路一次次被打断。段落输入一口气打完整段再上屏。",
   },
-    {
-    icon: "Sparkles",
-    title: "AI转写",
-    description:
-      "AI/云端/本地多路实时分析，结合历史上下文生成候选词，提高长段拼音转汉字的命中率。",
-  },  
   {
     icon: "Languages",
-    title: "最快速AI对话",
+    title: "中英标点不用切模式",
     description:
-      "随时发起AI对话，通过特定前缀触发和不同AI助手的对话功能，随时随地和AI宠物，AI秘书，AI翻译对话，效率大爆炸。",
+      "拼音、英文、标点混在一起直接打，不用反复切换输入模式。",
   },
-
   {
     icon: "Search",
-    title: "光标搜索与跳转",
+    title: "打错了不用整段重来",
     description:
-      "字母搜索跳转光标，标点符号跳转光标，长段文本快速编辑。",
+      "字母搜索、标点跳转直接定位光标，长段文本就地修改。",
+  },
+  {
+    icon: "ListChecks",
+    title: "Markdown 边打边成型",
+    description:
+      "标题、列表、引用、分隔线，直接在输入法里完成，上屏就是带格式的文本。",
   },
 ];
 

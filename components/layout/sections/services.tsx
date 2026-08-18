@@ -17,25 +17,27 @@ interface ServiceProps {
 }
 const serviceList: ServiceProps[] = [
   {
-    title: "写作与长段输入",
+    title: "写长文档的人",
     description:
-      "段落输入一次性完成一段编辑，AI加速识别，减少选词，适合长文与笔记场景。",
+      "论文、报告、周记，一段一段地打完再上屏；Markdown 边打边成型，标题和列表直接带格式。",
     pro: ProService.NO,
   },
   {
-    title: "翻译与双语写作",
+    title: "开发者",
     description:
-      "输入拼音直接输出英文，输入拼音直接输出双语，输入拼音直接完成语言润色，减少中间环节，增加效率。",
+      "代码编辑器自动切英文标点和 vim 模式，写注释时中英混输不用切换；专业术语进个人词库。",
     pro: ProService.NO,
   },
   {
-    title: "AI秘书AI猫娘",
-    description: "前缀触发不同 AI 助手，情感连接、翻译、事务管理，代码讲解等场景。",
+    title: "每天处理大量消息的人",
+    description:
+      "长回复用语音说完直接上屏，优化助手补好标点和语气；不满意就地让 AI 改写。",
     pro: ProService.NO,
   },
   {
-    title: "频繁AI对话需求",
-    description: "随时随地和AI对话，AI搜索，AI查找。",
+    title: "做翻译和双语内容的人",
+    description:
+      "输入拼音直接拿到译文候选，不用切到翻译网站再复制回来。",
     pro: ProService.NO,
   },
 ];
@@ -48,12 +50,11 @@ export const ServicesSection = () => {
       </h2>
 
       <h2 className="text-3xl md:text-4xl text-center font-bold mb-4">
-        让输入、创作与 AI 融合
+        不同的人，用法完全不同
       </h2>
       <h3 className="md:w-1/2 mx-auto text-xl text-center text-muted-foreground mb-8">
-        输入法可能是AI对话最好的入口，写作、代码、翻译随时随地对话，一气呵成。
+        段落输入、语音、AI 助手可以自由组合，下面是几种典型搭配。
       </h3>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4 w-full lg:w-[60%] mx-auto">
         {serviceList.map(({ title, description, pro }) => (

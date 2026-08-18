@@ -19,7 +19,6 @@ import {
 } from "../ui/navigation-menu";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import Image from "next/image";
 import { ToggleTheme } from "./toogle-theme";
 import { cn } from "@/lib/utils";
 import {
@@ -80,8 +79,8 @@ const featureList: FeatureProps[] = [
     description: "AI拼音转换，将一整个段落的拼音一次性转换成中文，准确率高，告别选词。",
   },
   {
-    title: "AI对话 · 自定义AI助手候选",
-    description: "AI猫娘，AI女友，AI秘书，AI翻译极速对话。",
+    title: "AI对话助手 · 随叫随到的专属搭子",
+    description: "输入法前缀触发AI助手对话: AI翻译，AI陪伴，AI秘书随叫随到",
   },
 ];
 
@@ -298,13 +297,10 @@ export const Navbar = () => {
             </NavigationMenuTrigger>
             <NavigationMenuContent>
               <div className="grid w-[600px] grid-cols-2 gap-5 p-4">
-                <Image
-                  src="https://avatars.githubusercontent.com/u/75042455?v=4"
-                  alt="RadixLogo"
-                  className="h-full w-full rounded-md object-cover"
-                  width={600}
-                  height={600}
-                />
+                <div className="flex h-full w-full flex-col items-center justify-center gap-3 rounded-md bg-gradient-to-tr from-primary via-primary/70 to-primary p-6 text-center">
+                  <ChevronsDown className="h-12 w-12 rounded-lg border border-secondary/40 text-white" />
+                  <p className="text-lg font-bold text-white">段落输入法</p>
+                </div>
                 <ul className="flex flex-col gap-2">
                   {featureList.map(({ title, description }) => (
                     <li
