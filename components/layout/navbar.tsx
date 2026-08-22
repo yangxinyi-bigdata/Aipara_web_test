@@ -1,6 +1,7 @@
 "use client";
-import { ChevronsDown, Download, LogIn, Menu, Settings } from "lucide-react";
+import { Download, LogIn, Menu, Settings } from "lucide-react";
 import React from "react";
+import { DuanluoMark } from "@/components/icons/duanluo-mark";
 import {
   Sheet,
   SheetContent,
@@ -284,7 +285,7 @@ export const Navbar = () => {
         href="/"
         className="font-bold text-base sm:text-lg flex items-center gap-2 whitespace-nowrap flex-shrink-0"
       >
-        <ChevronsDown className="bg-gradient-to-tr border-secondary from-primary via-primary/70 to-primary rounded-lg w-9 h-9 mr-1 sm:mr-2 border text-white shrink-0 aspect-square" />
+        <DuanluoMark className="bg-gradient-to-tr border-secondary from-primary via-primary/70 to-primary rounded-lg w-9 h-9 mr-1 sm:mr-2 border text-white shrink-0 aspect-square" />
         AI段落输入法
       </Link>
 
@@ -298,7 +299,7 @@ export const Navbar = () => {
             <NavigationMenuContent>
               <div className="grid w-[600px] grid-cols-2 gap-5 p-4">
                 <div className="flex h-full w-full flex-col items-center justify-center gap-3 rounded-md bg-gradient-to-tr from-primary via-primary/70 to-primary p-6 text-center">
-                  <ChevronsDown className="h-12 w-12 rounded-lg border border-secondary/40 text-white" />
+                  <DuanluoMark className="h-12 w-12 rounded-lg border border-secondary/40 text-white" />
                   <p className="text-lg font-bold text-white">段落输入法</p>
                 </div>
                 <ul className="flex flex-col gap-2">
@@ -436,7 +437,7 @@ export const Navbar = () => {
             <SheetHeader className="mb-4 ml-4">
               <SheetTitle className="flex items-center">
                 <Link href="/" className="flex items-center">
-                  <ChevronsDown className="bg-gradient-to-tr border-secondary from-primary via-primary/70 to-primary rounded-lg w-9 h-9 mr-2 border text-white" />
+                  <DuanluoMark className="bg-gradient-to-tr border-secondary from-primary via-primary/70 to-primary rounded-lg w-9 h-9 mr-2 border text-white" />
                   段落输入法
                 </Link>
               </SheetTitle>

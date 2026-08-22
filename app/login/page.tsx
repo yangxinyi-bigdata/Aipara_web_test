@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronsDown } from "lucide-react";
+import { DuanluoMark } from "@/components/icons/duanluo-mark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -355,7 +355,7 @@ const LoginContent = () => {
 
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-secondary bg-primary text-primary-foreground">
-                <ChevronsDown className="h-6 w-6" />
+                <DuanluoMark className="h-6 w-6" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">段落输入法登录中心</p>

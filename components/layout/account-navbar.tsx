@@ -3,7 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ChevronsDown, LogIn, LogOut } from "lucide-react";
+import { ArrowLeft, LogIn, LogOut } from "lucide-react";
+import { DuanluoMark } from "@/components/icons/duanluo-mark";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -107,7 +108,7 @@ export const AccountNavbar = ({ variant = "account" }: AccountNavbarProps) => {
         href="/"
         className="font-bold text-lg flex items-center gap-2 whitespace-nowrap flex-shrink-0"
       >
-        <ChevronsDown className="bg-gradient-to-tr border-secondary from-primary via-primary/70 to-primary rounded-lg w-9 h-9 mr-2 border text-white shrink-0 aspect-square" />
+        <DuanluoMark className="bg-gradient-to-tr border-secondary from-primary via-primary/70 to-primary rounded-lg w-9 h-9 mr-2 border text-white shrink-0 aspect-square" />
         AI段落输入法
       </Link>
       <div className="ml-auto flex items-center gap-2">
