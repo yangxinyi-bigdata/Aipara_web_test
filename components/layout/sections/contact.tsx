@@ -5,7 +5,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Building2, Clock, Mail, Phone } from "lucide-react";
+import { Building2, Clock, Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,6 +27,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+
+/**
+ * 对外公开的联系邮箱。企业域名邮箱，Apple Developer Program 组织入网
+ * 要求联系邮箱位于公司域名下，个人邮箱（iCloud/QQ 等）不被接受。
+ * 页面展示与 mailto 链接共用这一个常量。
+ */
+const CONTACT_EMAIL = "service@duanluo.chat";
 
 const formSchema = z.object({
   firstName: z.string().min(2).max(255),
@@ -52,7 +59,7 @@ export const ContactSection = () => {
     const { firstName, lastName, email, subject, message } = values;
     console.log(values);
 
-    const mailToLink = `mailto:yangxinyigo@icloud.com?subject=${encodeURIComponent(
+    const mailToLink = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
       subject
     )}&body=${encodeURIComponent(
       `您好，我是${firstName}${lastName}，联系邮箱 ${email}。\n${message}`
@@ -88,20 +95,11 @@ export const ContactSection = () => {
 
             <div>
               <div className="flex gap-2 mb-1">
-                <Phone />
-                <div className="font-bold">电话</div>
-              </div>
-
-              <div>+86 000-0000-0000（工作日）</div>
-            </div>
-
-            <div>
-              <div className="flex gap-2 mb-1">
                 <Mail />
                 <div className="font-bold">邮箱</div>
               </div>
 
-              <div>yangxinyigo@icloud.com</div>
+              <div>{CONTACT_EMAIL}</div>
             </div>
 
             <div>
