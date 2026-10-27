@@ -7,7 +7,7 @@ Duanluo Web 是 Duanluo AI 段落输入法的官网与用户中心项目。项�
 - 官网首页：展示 Duanluo 的 AI 段落输入、跨语种输入、AI 拼音识别、下载入口、FAQ、联系信息等内容。
 - 登录注册：支持手机号/邮箱验证码登录、账号密码登录，并在新用户登录后引导设置密码。
 - 用户中心：包含账户概览、密码设置、邮箱/手机号绑定、订阅管理和钱包流水。
-- CloudBase 后端：通过 `user_profile_service` 云函数处理资料同步、订阅升级/取消/续费和开发阶段钱包充值。
+- CloudBase 后端：通过 `user_profile_service` 云函数处理资料同步和订阅升级/取消/续费；钱包充值已锁住。
 - 静态部署：生产构建为 Next.js static export，输出目录为 `out`，用于 CloudBase 静态网站托管。
 
 ## 技术栈
@@ -95,11 +95,10 @@ Duanluo Web 是 Duanluo AI 段落输入法的官网与用户中心项目。项�
 | --- | --- |
 | `profile.sync` | 同步或初始化用户资料 |
 | `profile.updateMeta` | 更新用户扩展资料，例如邮箱、手机号、密码设置标记 |
-| `profile.update` | 更新用户套餐/点数等资料字段 |
 | `subscription.upgrade` | 扣减余额并升级到 Pro |
 | `subscription.cancel` | 取消 Pro 并回退到免费套餐 |
 | `subscription.renew` | 扣减余额并续费 Pro |
-| `wallet.recharge` | 开发阶段模拟充值 |
+| `wallet.recharge` | 已锁住，固定返回 403「充值暂未开放」；会员与额度只能由服务端写入 |
 
 当前代码涉及的关系型数据库表：
 

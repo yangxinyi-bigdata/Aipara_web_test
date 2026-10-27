@@ -144,65 +144,6 @@ const parseMeta = (meta) => {
   return {};
 };
 
-const normalizeDateTime = (value) => {
-  if (value === null || value === undefined) return null;
-  if (value instanceof Date) return formatMysqlDateTime(value);
-  if (typeof value === "number") {
-    const date = new Date(value);
-    if (!Number.isNaN(date.getTime())) {
-      return formatMysqlDateTime(date);
-    }
-    return null;
-  }
-  if (typeof value === "string") {
-    const trimmed = value.trim();
-    if (!trimmed) return null;
-    if (trimmed.includes("T")) {
-      const date = new Date(trimmed);
-      if (!Number.isNaN(date.getTime())) {
-        return formatMysqlDateTime(date);
-      }
-    }
-    return trimmed;
-  }
-  return null;
-};
-
-const sanitizeProfileUpdate = (payload) => {
-  const input = ensureObject(payload);
-  const output = {};
-
-  if (typeof input.plan_tier === "string" && input.plan_tier.trim()) {
-    output.plan_tier = input.plan_tier.trim();
-  }
-  if (typeof input.subscription_status === "string" && input.subscription_status.trim()) {
-    output.subscription_status = input.subscription_status.trim();
-  }
-
-  const dateFields = [
-    "subscription_start_at",
-    "subscription_end_at",
-    "points_reset_at",
-    "updated_at",
-    "last_login_at",
-  ];
-  for (const key of dateFields) {
-    if (key in input) {
-      const normalized = normalizeDateTime(input[key]);
-      if (normalized !== null) {
-        output[key] = normalized;
-      }
-    }
-  }
-
-  if (input.points_balance !== undefined) {
-    const balance = parseNumber(input.points_balance);
-    output.points_balance = Math.max(0, Math.floor(balance));
-  }
-
-  return output;
-};
-
 const getUid = () => {
   const info = app.auth().getUserInfo();
   if (!info?.uid) {
@@ -331,25 +272,6 @@ const handleProfileUpdateMeta = async (db, uid, payload) => {
   }
 
   return { meta: mergedMeta };
-};
-
-const handleProfileUpdate = async (db, uid, payload) => {
-  const updates = sanitizeProfileUpdate(payload);
-  if (!Object.keys(updates).length) {
-    throw new AppError(400, "没有可更新的字段");
-  }
-
-  const { error } = await db
-    .from("user_profile")
-    .update(updates)
-    .eq("uid", uid)
-    .eq("owner", uid);
-
-  if (error) {
-    throw new AppError(500, "更新用户信息失败");
-  }
-
-  return {};
 };
 
 const handleSubscriptionUpgrade = async (db, uid, payload) => {
@@ -576,45 +498,6 @@ const handleSubscriptionRenew = async (db, uid) => {
   return { order_id: orderId };
 };
 
-const handleWalletRecharge = async (db, uid) => {
-  const profile = await getProfile(db, uid);
-  if (!profile) {
-    throw new AppError(400, "用户信息不存在");
-  }
-
-  const balanceAmount = parseNumber(profile.balance_amount);
-  const nextBalance = Number((balanceAmount + PRICE_AMOUNT).toFixed(2));
-  const orderId = `RC-${Date.now()}`;
-
-  const { error: profileError } = await db
-    .from("user_profile")
-    .update({ balance_amount: nextBalance })
-    .eq("uid", uid)
-    .eq("owner", uid);
-
-  if (profileError) {
-    throw new AppError(500, "更新余额失败");
-  }
-
-  const { error: ledgerError } = await db.from("user_billing_ledger").insert({
-    uid,
-    txn_type: "recharge",
-    amount: PRICE_AMOUNT,
-    currency: DEFAULT_CURRENCY,
-    status: "success",
-    order_id: orderId,
-    provider: "manual",
-    remark: "开发阶段充值",
-    _openid: uid,
-  });
-
-  if (ledgerError) {
-    throw new AppError(500, "写入账单记录失败");
-  }
-
-  return { order_id: orderId, balance_amount: nextBalance };
-};
-
 exports.main = async (event) => {
   try {
     const input = normalizeEvent(event);
@@ -630,8 +513,6 @@ exports.main = async (event) => {
     switch (action) {
       case "profile.sync":
         return { code: 0, data: await handleProfileSync(db, uid, payload) };
-      case "profile.update":
-        return { code: 0, data: await handleProfileUpdate(db, uid, payload) };
       case "profile.updateMeta":
         return { code: 0, data: await handleProfileUpdateMeta(db, uid, payload) };
       case "subscription.upgrade":
@@ -641,7 +522,8 @@ exports.main = async (event) => {
       case "subscription.renew":
         return { code: 0, data: await handleSubscriptionRenew(db, uid) };
       case "wallet.recharge":
-        return { code: 0, data: await handleWalletRecharge(db, uid) };
+        // 不付款就能加余额，已锁住；会员与额度只能由服务端写入。
+        throw new AppError(403, "充值暂未开放");
       default:
         throw new AppError(400, "未知的 action");
     }
