@@ -13,6 +13,8 @@ import {
   type CloudbaseClient,
 } from "@/lib/cloudbase";
 import { callProfileService } from "@/lib/profile-service";
+import { describeAuthError, getAuthErrorCode } from "@/lib/auth-errors";
+import { useCountdown } from "@/lib/use-countdown";
 import {
   formatPhoneForDisplay,
   getUserPhone,
@@ -83,6 +85,7 @@ const BindingsPage = () => {
     StatusMessage | null
   >(null);
   const [isSendingEmail, setIsSendingEmail] = React.useState(false);
+  const emailCooldown = useCountdown();
   const [isBindingEmail, setIsBindingEmail] = React.useState(false);
 
   const [phone, setPhone] = React.useState("");
@@ -94,6 +97,7 @@ const BindingsPage = () => {
     StatusMessage | null
   >(null);
   const [isSendingPhone, setIsSendingPhone] = React.useState(false);
+  const phoneCooldown = useCountdown();
   const [isBindingPhone, setIsBindingPhone] = React.useState(false);
 
   const loadProfile = async (
@@ -268,6 +272,7 @@ const BindingsPage = () => {
       return;
     }
 
+    if (emailCooldown.isCoolingDown) return;
     setIsSendingEmail(true);
     setEmailStatusMessage(null);
     try {
@@ -280,11 +285,15 @@ const BindingsPage = () => {
         type: "success",
         message: "验证码已发送，请查收邮箱。",
       });
+      emailCooldown.start();
     } catch (error) {
       console.error("Failed to send email verification", error);
+      if (getAuthErrorCode(error) === "resource_exhausted") {
+        emailCooldown.start();
+      }
       setEmailStatusMessage({
         type: "error",
-        message: "验证码发送失败，请检查邮箱后重试。",
+        message: describeAuthError(error, "验证码发送失败，请检查邮箱后重试。"),
       });
     } finally {
       setIsSendingEmail(false);
@@ -376,7 +385,7 @@ const BindingsPage = () => {
       console.error("Failed to bind email", error);
       setEmailStatusMessage({
         type: "error",
-        message: "邮箱绑定失败，请检查验证码后重试。",
+        message: describeAuthError(error, "邮箱绑定失败，请检查验证码后重试。"),
       });
     } finally {
       setIsBindingEmail(false);
@@ -407,6 +416,7 @@ const BindingsPage = () => {
       return;
     }
 
+    if (phoneCooldown.isCoolingDown) return;
     setIsSendingPhone(true);
     setPhoneStatusMessage(null);
     try {
@@ -421,11 +431,15 @@ const BindingsPage = () => {
         type: "success",
         message: "验证码已发送，请注意查收短信。",
       });
+      phoneCooldown.start();
     } catch (error) {
       console.error("Failed to send phone verification", error);
+      if (getAuthErrorCode(error) === "resource_exhausted") {
+        phoneCooldown.start();
+      }
       setPhoneStatusMessage({
         type: "error",
-        message: "验证码发送失败，请检查手机号后重试。",
+        message: describeAuthError(error, "验证码发送失败，请检查手机号后重试。"),
       });
     } finally {
       setIsSendingPhone(false);
@@ -519,7 +533,7 @@ const BindingsPage = () => {
       console.error("Failed to bind phone", error);
       setPhoneStatusMessage({
         type: "error",
-        message: "手机号绑定失败，请检查验证码后重试。",
+        message: describeAuthError(error, "手机号绑定失败，请检查验证码后重试。"),
       });
     } finally {
       setIsBindingPhone(false);
@@ -676,10 +690,14 @@ const BindingsPage = () => {
                     <Button
                       variant="secondary"
                       onClick={handleSendEmailCode}
-                      disabled={isSendingEmail}
+                      disabled={isSendingEmail || emailCooldown.isCoolingDown}
                       className="sm:mb-1"
                     >
-                      {isSendingEmail ? "发送中..." : "发送验证码"}
+                      {isSendingEmail
+                        ? "发送中..."
+                        : emailCooldown.isCoolingDown
+                          ? `${emailCooldown.secondsLeft} 秒后重发`
+                          : "发送验证码"}
                     </Button>
                   </div>
 
@@ -743,10 +761,14 @@ const BindingsPage = () => {
                     <Button
                       variant="secondary"
                       onClick={handleSendPhoneCode}
-                      disabled={isSendingPhone}
+                      disabled={isSendingPhone || phoneCooldown.isCoolingDown}
                       className="sm:mb-1"
                     >
-                      {isSendingPhone ? "发送中..." : "发送验证码"}
+                      {isSendingPhone
+                        ? "发送中..."
+                        : phoneCooldown.isCoolingDown
+                          ? `${phoneCooldown.secondsLeft} 秒后重发`
+                          : "发送验证码"}
                     </Button>
                   </div>
 

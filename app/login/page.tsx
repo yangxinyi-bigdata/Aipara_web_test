@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 import { getCloudbaseClient } from "@/lib/cloudbase";
 import { formatPhoneForDisplay, normalizePhoneForApi } from "@/lib/phone";
 import { getUserUid } from "@/lib/user";
+import { describeAuthError, getAuthErrorCode } from "@/lib/auth-errors";
+import { useCountdown } from "@/lib/use-countdown";
 
 type LoginMode = "password" | "code";
 type IdentifierType = "phone" | "email" | "invalid";
@@ -107,6 +109,7 @@ const LoginContent = () => {
   const [successMessage, setSuccessMessage] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isSendingCode, setIsSendingCode] = React.useState(false);
+  const sendCooldown = useCountdown();
 
   const identifierInfo = React.useMemo(
     () => parseIdentifier(identifier),
@@ -208,13 +211,18 @@ const LoginContent = () => {
       router.push(nextPath);
     } catch (error) {
       console.error("Password login failed", error);
-      setErrorMessage("账号或密码错误，请重试。");
+      setErrorMessage(
+        describeAuthError(error, "账号或密码错误，请重试。", {
+          password_not_set: "该账号尚未设置密码，请使用验证码登录。",
+        })
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleSendVerification = async () => {
+    if (sendCooldown.isCoolingDown) return;
     resetMessages();
     if (!identifierInfo.raw) {
       setErrorMessage("请输入手机号或邮箱。");
@@ -246,9 +254,13 @@ const LoginContent = () => {
         },
       });
       setSuccessMessage("验证码已发送，请查收。");
+      sendCooldown.start();
     } catch (error) {
       console.error("Failed to send verification", error);
-      setErrorMessage("验证码发送失败，请稍后重试。");
+      if (getAuthErrorCode(error) === "resource_exhausted") {
+        sendCooldown.start();
+      }
+      setErrorMessage(describeAuthError(error, "验证码发送失败，请稍后重试。"));
     } finally {
       setIsSendingCode(false);
     }
@@ -335,7 +347,9 @@ const LoginContent = () => {
       if (description.includes("User not exist")) {
         setErrorMessage("账号未注册，请重新获取验证码注册。");
       } else {
-        setErrorMessage("验证码错误或已过期，请重新获取。");
+        setErrorMessage(
+          describeAuthError(error, "验证码错误或已过期，请重新获取。")
+        );
       }
     } finally {
       setIsSubmitting(false);
@@ -444,9 +458,13 @@ const LoginContent = () => {
                     type="button"
                     variant="secondary"
                     onClick={handleSendVerification}
-                    disabled={isSendingCode}
+                    disabled={isSendingCode || sendCooldown.isCoolingDown}
                   >
-                    {isSendingCode ? "发送中..." : "发送验证码"}
+                    {isSendingCode
+                      ? "发送中..."
+                      : sendCooldown.isCoolingDown
+                        ? `${sendCooldown.secondsLeft} 秒后重发`
+                        : "发送验证码"}
                   </Button>
                 </div>
               )}

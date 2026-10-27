@@ -13,6 +13,8 @@ import {
   type CloudbaseClient,
 } from "@/lib/cloudbase";
 import { callProfileService } from "@/lib/profile-service";
+import { describeAuthError, getAuthErrorCode } from "@/lib/auth-errors";
+import { useCountdown } from "@/lib/use-countdown";
 import {
   formatPhoneForDisplay,
   getUserPhone,
@@ -78,6 +80,7 @@ const PasswordPage = () => {
   const [newPassword, setNewPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [isSendingCode, setIsSendingCode] = React.useState(false);
+  const sendCooldown = useCountdown();
   const [isSettingPassword, setIsSettingPassword] = React.useState(false);
   const [statusMessage, setStatusMessage] = React.useState<{
     type: "success" | "error";
@@ -227,6 +230,7 @@ const PasswordPage = () => {
   };
 
   const handleSendVerification = async () => {
+    if (sendCooldown.isCoolingDown) return;
     const client = getCloudbaseClient();
     if (!client) return;
 
@@ -254,11 +258,15 @@ const PasswordPage = () => {
         type: "success",
         message: "验证码已发送，请查收。",
       });
+      sendCooldown.start();
     } catch (error) {
       console.error("Failed to send verification code", error);
+      if (getAuthErrorCode(error) === "resource_exhausted") {
+        sendCooldown.start();
+      }
       setStatusMessage({
         type: "error",
-        message: "验证码发送失败，请检查信息后重试。",
+        message: describeAuthError(error, "验证码发送失败，请检查信息后重试。"),
       });
     } finally {
       setIsSendingCode(false);
@@ -341,7 +349,7 @@ const PasswordPage = () => {
       console.error("Failed to set password", error);
       setStatusMessage({
         type: "error",
-        message: "密码设置失败，请检查验证码后重试。",
+        message: describeAuthError(error, "密码设置失败，请检查验证码后重试。"),
       });
     } finally {
       setIsSettingPassword(false);
@@ -499,10 +507,14 @@ const PasswordPage = () => {
                     <Button
                       variant="secondary"
                       onClick={handleSendVerification}
-                      disabled={isSendingCode}
+                      disabled={isSendingCode || sendCooldown.isCoolingDown}
                       className="sm:mb-1"
                     >
-                      {isSendingCode ? "发送中..." : "发送验证码"}
+                      {isSendingCode
+                        ? "发送中..."
+                        : sendCooldown.isCoolingDown
+                          ? `${sendCooldown.secondsLeft} 秒后重发`
+                          : "发送验证码"}
                     </Button>
                   </div>
 
