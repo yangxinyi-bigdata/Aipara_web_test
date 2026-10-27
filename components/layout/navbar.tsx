@@ -143,6 +143,7 @@ export const Navbar = () => {
     null
   );
   const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
+  const [isNavHidden, setIsNavHidden] = React.useState(false);
   const userMenuDesktopRef = React.useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -233,6 +234,35 @@ export const Navbar = () => {
   }, []);
 
   React.useEffect(() => {
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        const currentY = window.scrollY;
+        const delta = currentY - lastScrollY;
+
+        if (currentY < 80) {
+          setIsNavHidden(false);
+        } else if (delta > 6) {
+          setIsNavHidden(true);
+          setIsUserMenuOpen(false);
+        } else if (delta < -6) {
+          setIsNavHidden(false);
+        }
+
+        lastScrollY = currentY;
+        ticking = false;
+      });
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
       if (userMenuDesktopRef.current?.contains(target)) {
@@ -279,8 +309,23 @@ export const Navbar = () => {
     }
   };
 
+  const shouldHideNav = isNavHidden && !isOpen && !isUserMenuOpen;
+
   return (
-    <header className="shadow-inner bg-opacity-15 w-[95%] min-[1280px]:w-[85%] lg:max-w-screen-xl top-5 mx-auto sticky border border-secondary z-40 rounded-2xl grid grid-cols-[auto_minmax(0,1fr)_auto] min-[1050px]:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 p-2 bg-card">
+    <>
+      {shouldHideNav && (
+        <div
+          className="fixed inset-x-0 top-0 z-30 h-3"
+          aria-hidden
+          onMouseEnter={() => setIsNavHidden(false)}
+        />
+      )}
+      <header
+        className={cn(
+          "shadow-inner bg-opacity-15 w-[95%] min-[1280px]:w-[85%] lg:max-w-screen-xl top-5 mx-auto sticky border border-secondary z-40 rounded-2xl grid grid-cols-[auto_minmax(0,1fr)_auto] min-[1050px]:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 p-2 bg-card transition-transform duration-300 ease-in-out",
+          shouldHideNav && "-translate-y-[calc(100%+2rem)]"
+        )}
+      >
       <Link
         href="/"
         className="font-bold text-base sm:text-lg flex items-center gap-2 whitespace-nowrap flex-shrink-0"
@@ -459,6 +504,7 @@ export const Navbar = () => {
           </SheetContent>
         </Sheet>
       </div>
-    </header>
+      </header>
+    </>
   );
 };
